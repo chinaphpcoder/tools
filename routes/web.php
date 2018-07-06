@@ -23,7 +23,8 @@ Auth::routes();
 //}
 
 //首页
-Route::get('/', 'HomeController@index');//->middleware('auth')->name('home');
+Route::get('/', 'HomeController@index')->middleware('auth')->name('home');
+
 
 //上传图片
 Route::post('/uploadImage', 'PublicController@uploadImage')->middleware('auth')->name('upload_image');
