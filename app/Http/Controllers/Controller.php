@@ -4,7 +4,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Http\Models\Menus;
+use App\Http\Models\Menu;
 
 class Controller extends BaseController{
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
@@ -13,7 +13,7 @@ class Controller extends BaseController{
 
     public function __construct() {
         //获取菜单列表
-        $list = Menus::where('status', 1)->orderBy('sort', 'desc')->orderBy('id', 'asc')->select(['title', 'url', 'group', 'tip'])->get();
+        $list = Menu::where('status', 1)->orderBy('sort', 'desc')->orderBy('id', 'asc')->select(['title', 'url', 'group', 'tip'])->get();
 
         //菜单列表分组
         $tmp = [];
