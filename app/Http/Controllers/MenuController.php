@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use App\Http\Models\AdminMenu;
+use App\Http\Models\Menus;
 
 /**
  * 菜单管理
@@ -12,7 +12,7 @@ class MenuController extends Controller{
      * 列表
      */
     public function lists(){
-        $list = AdminMenu::orderBy('id', 'desc')->paginate(20);
+        $list = Menus::orderBy('id', 'desc')->paginate(20);
         $this->view_data['meta_title'] = '菜单列表';
         $this->view_data['list'] = $list;
         return view('menu.index', $this->view_data);
@@ -43,7 +43,7 @@ class MenuController extends Controller{
             $sort = $request->input('sort');
             $tip = $request->input('tip');
 
-            $admin_menu = new AdminMenu;
+            $admin_menu = new Menus;
             $admin_menu->title = $request->input('title');
             $admin_menu->sort = isset($sort) ? $sort : 0;
             $admin_menu->url = '/' . ltrim($request->input('url'), '/');

@@ -5,6 +5,6 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * 后台菜单管理
  */
-class AdminUser extends Model{
+class Users extends Model{
 
 }

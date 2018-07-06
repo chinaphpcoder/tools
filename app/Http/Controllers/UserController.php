@@ -2,7 +2,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Models\AdminUser;
+use App\Http\Models\Users;
 
 /**
  * 后台用户
@@ -19,7 +19,7 @@ class UserController extends Controller{
             return $check;
         }
 
-        $list = AdminUser::orderBy('id', 'desc')->paginate(20);
+        $list = Users::orderBy('id', 'desc')->paginate(20);
 
         $this->view_data['meta_title'] = '后台用户列表';
         $this->view_data['list'] = $list;
@@ -57,7 +57,7 @@ class UserController extends Controller{
         }
 
         //查询指定记录
-        $row = AdminUser::where('id', $id)->first();
+        $row = Users::where('id', $id)->first();
         if (empty($row)) {
             return $this->error('没有查询到指定记录');
         }
@@ -95,9 +95,9 @@ class UserController extends Controller{
         }
         //查询邮箱是否重复
         if ($id > 0) {
-            $row = AdminUser::where('id', '!=', $id)->where('email', $email)->first();
+            $row = Users::where('id', '!=', $id)->where('email', $email)->first();
         } else {
-            $row = AdminUser::where('email', $email)->first();
+            $row = Users::where('email', $email)->first();
         }
         if ($row) {
             return $this->error('该邮箱已经存在，请使用其他邮箱');
@@ -109,9 +109,9 @@ class UserController extends Controller{
         }
 
         if ($id > 0) {
-            $user = AdminUser::find($id);
+            $user = Users::find($id);
         } else {
-            $user = new AdminUser;
+            $user = new Users;
         }
 
         $user->name = $name;
@@ -150,7 +150,7 @@ class UserController extends Controller{
         }
 
         //批量删除
-        $result = AdminUser::destroy($ids);
+        $result = Users::destroy($ids);
     
         if ($result) {
             return $this->success(route('user_list'), '删除成功');
