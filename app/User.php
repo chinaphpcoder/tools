@@ -12,7 +12,7 @@ class User extends Authenticatable
     /**
      * 关联的表名
      */
-    protected $table = 'admin_users';
+    protected $table = 'users';
 
     /**
      * The attributes that are mass assignable.
