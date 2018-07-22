@@ -16,7 +16,3 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-
-
-// 小沙故事--小沙投资列表
-Route::get('Story/invest_list', 'StoryController@invest_list');

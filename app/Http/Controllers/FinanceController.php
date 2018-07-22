@@ -10,7 +10,7 @@ use PHPExcel_IOFactory;
 use PHPExcel_Style_Alignment;
 use PHPExcel_Style_Border;
 
-class PrizeController extends Controller
+class FinanceController extends Controller
 {
 
     public function accountRecord(Request $request)
@@ -28,39 +28,67 @@ class PrizeController extends Controller
         return view('finance.accountRecord', $this->view_data);
     }
 
-    public function prize_list(Request $request)
+    public function getAccountRecord(Request $request)
     {
-        $identification = $request->route('identification','');
-        $is_test = $request->input('is_test', '0');
-        $lists = DB::connection('vault')
-                    ->table('vault_activity_prize')
-                    ->join('vault_activity', 'vault_activity_prize.activity_id', '=', 'vault_activity.id')
-                    ->where('vault_activity.activity_identification','=',$identification)
-                    ->where('vault_activity.is_test','=',$is_test)
-                    ->select(['vault_activity_prize.id','vault_activity_prize.admin_prize_name','vault_activity_prize.obtain_probability','vault_activity.is_test'])
-                    ->get();
+        $page = $request->input('page');
+        $limit = $request->input('limit');
+        if($page <= 1) {
+            $page = 1;
+        }
+        if($limit <= 1) {
+            $limit = 10;
+        }
+
+        $limit_start = ($page - 1) * $limit;
+
+        $total_count = DB::table('bill_record')->count();
+        $statuses = [ 0=>'未上传数据'];
+        $lists = DB::table('bill_record')
+            ->join('users', 'bill_record.user_id', '=', 'users.id')
+            ->select(['bill_record.id','users.name','bill_record.business_identity','bill_record.status','bill_record.created_at'])
+            ->orderBy('bill_record.id', 'desc')
+            ->offset($limit_start)
+            ->limit($limit)
+            ->get();
         $lists = json_decode(json_encode($lists),true);
         $count = 1;
         foreach ($lists as $key=>$value) {
-            $lists[$key]['obtain_probability'] = $value['obtain_probability'] / 100 ."%";
             $lists[$key]['pid'] = $count;
+            $lists[$key]['status_text'] = $statuses[$value['status']];
             $count++;
         }
         $result = [];
         $result['code'] = 0;
         $result['msg'] = '';
-        $result['count'] = count($lists);
+        $result['count'] = $total_count;
         $result['data'] = $lists;
         return $result;
     }
 
-    public function probability_edit(Request $request)
+    public function addAccountRecord(Request $request)
     {
-        $id = $request->input('id');
-        $info = DB::connection('vault')->table('vault_activity_prize')->where('id','=',$id)->first();
-        $this->view_data['obtain_probability'] = $info->obtain_probability;
-        $this->view_data['id'] = $id;
-        return view('prize.probability_edit', $this->view_data);
+        $ymd = date("Ymd");
+        $pre_business_identity = DB::table('bill_record')
+                    ->where('business_identity','like',"{$ymd}%")
+                    ->max('business_identity');
+        
+        if($pre_business_identity == null) {
+            $pre_business_identity = date("Ymd")."0000";
+        }
+        $business_identity = $pre_business_identity + 1;
+        
+        $insert_data = [
+            'business_identity' => $business_identity,
+            'status' => 0,
+            'user_id' => Auth::id(),
+        ];
+
+        $id = DB::table('bill_record')
+                ->insert($insert_data);
+        if ( $id <= 0 ) {
+            return $this->error('添加失败');
+        }
+        return $this->success('添加成功');
     }
 
     public function probability_update(Request $request){

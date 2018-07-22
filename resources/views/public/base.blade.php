@@ -5,12 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{{$meta_title}} | AdminLTE 2</title>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <meta name="_token" content="{!! csrf_token() !!}"/>
     <link rel="stylesheet" href="{{ asset('bootstrap-3.3.7/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="//cdn.bootcss.com/ionicons/2.0.1/css/ionicons.min.css">
     <link rel="stylesheet" href="//cdn.bootcss.com/jvectormap/1.2.2/jquery-jvectormap.min.css">
     <link rel="stylesheet" href="//cdn.bootcss.com/admin-lte/2.3.11/css/AdminLTE.min.css">
     <link rel="stylesheet" href="//cdn.bootcss.com/admin-lte/2.3.11/css/skins/_all-skins.min.css">
+
     <style type="text/css">
         .box-body-list{
             overflow-x: auto;

@@ -212,3 +212,5 @@ Route::get('/weixin/reply_setting', 'WeixinController@replySetting')->middleware
 Route::post('/weixin/reply_update', 'WeixinController@replyUpdate')->middleware('auth')->name('weixin.reply_update');
 
 Route::get('/finance/account-record','FinanceController@accountRecord')->middleware('auth')->name('finance.account-record');
+Route::get('/finance/get-account-record','FinanceController@getAccountRecord')->middleware('auth')->name('finance.get-account-record');
+Route::post('/finance/add-account-record','FinanceController@addAccountRecord')->middleware('auth')->name('finance.add-account-record');
