@@ -109,46 +109,64 @@ class FinanceController extends Controller
 
     }
 
-    public function details(Request $request)
+    public function accountRecordDetails(Request $request)
     {
         $id = $request->input('id');
-        $info = DB::connection('vault')->table('vault_activity_prize')->where('id','=',$id)->first();
-        $conditions = $info->obtain_conditions;
-        $conditions = json_decode($conditions,true);
+        $info = DB::table('bill_record')
+                ->where('id','=',$id)
+                ->first();
+        $info = json_decode(json_encode($info),true);
+        $statuses = [ 0=>'未上传数据'];
+        $overall_data = [];
+        $overall_data[] = ['key' => '业务标识', 'value' => $info['business_identity'] ];
+        $overall_data[] = ['key' => '总体进度', 'value' => $statuses[$info['status']] ];
+        $overall_data[] = ['key' => '创建时间', 'value' => $info['created_at'] ];
+        $business_identity_id = $info['id'];
+        $base_info = DB::table('bill_detail_log')
+                ->where('business_identity_id','=',$business_identity_id)
+                ->where('base_amount','>',0)
+                ->select(
+                    DB::raw('count(*) as count'),
+                    DB::raw('sum(base_amount) as total_amount')
+                )
+                ->get();
+        $base_info = json_decode(json_encode($base_info),true);
+        $base_info = $base_info[0];
 
-        $obtain_conditions = [];
+        $basic_data = [];
+        $basic_data[] = ['key' => '数据条数', 'value' => $base_info['count'] == null ? 0 : $base_info['count'] ];
+        $basic_data[] = ['key' => '总金额(元)', 'value' => $base_info['total_amount'] == null ? 0 : $base_info['total_amount'] ];
 
-        $obtain_conditions['obtain_limit']['key'] = '奖品上限';
-        $obtain_conditions['obtain_limit']['value'] = isset($conditions['obtain_limit']) ? $conditions['obtain_limit'] : '无限制';
-        $obtain_conditions['start_times']['key'] = '最少抽奖次数';
-        $obtain_conditions['start_times']['value'] = isset($conditions['start_times']) ? $conditions['start_times'] : '1';
+        $actual_info = DB::table('bill_detail_log')
+                ->where('business_identity_id','=',$business_identity_id)
+                ->where('account_amount','>',0)
+                ->select(
+                    DB::raw('count(*) as count'),
+                    DB::raw('sum(account_amount) as total_amount')
+                )
+                ->get();
+        $actual_info = json_decode(json_encode($actual_info),true);
+        $actual_info = $actual_info[0];
 
-        $attribute = $info->prize_attribute;
-        $attribute = json_decode($attribute,true);
+        $actual_data = [];
+        $actual_data[] = ['key' => '数据条数', 'value' => $actual_info['count'] == null ? 0 : $actual_info['count'] ];
+        $actual_data[] = ['key' => '总金额(元)', 'value' => $actual_info['total_amount'] == null ? 0 : $actual_info['total_amount'] ];
 
-        $prize_attribute = [];
-        $prize_attribute['red_packet_name']['key'] = '红包名称';
-        $prize_attribute['red_packet_name']['value'] = isset($attribute['red_packet_name']) ? $attribute['red_packet_name'] : '';
-        $prize_attribute['red_packet_amount']['key'] = '红包金额';
-        $prize_attribute['red_packet_amount']['value'] = isset($attribute['red_packet_amount']) ? $attribute['red_packet_amount'] : '';
-        $prize_attribute['invest_term_type']['key'] = '期限类型';
-        $prize_attribute['invest_term_type']['value'] = isset($attribute['invest_term_type']) ? $attribute['invest_term_type'] : '';
-        $prize_attribute['invest_term_number']['key'] = '期限长度';
-        $prize_attribute['invest_term_number']['value'] = isset($attribute['invest_term_number']) ? $attribute['invest_term_number'] : '';
-        $prize_attribute['invest_amount']['key'] = '投资金额';
-        $prize_attribute['invest_amount']['value'] = isset($attribute['invest_amount']) ? $attribute['invest_amount'] : '';
-        $prize_attribute['invest_products']['key'] = '适用产品';
-        $prize_attribute['invest_products']['value'] = isset($attribute['invest_products']) ? $attribute['invest_products'] : '';
-        $prize_attribute['type']['key'] = '红包类型';
-        $prize_attribute['type']['value'] = isset($attribute['type']) ? $attribute['type'] : '';
-        $prize_attribute['end_time']['key'] = '红包有效期';
-        $prize_attribute['end_time']['value'] = isset($attribute['end_time']) ? $attribute['end_time'] : '';
+        $this->view_data['overall_data'] = $overall_data;
+        $this->view_data['basic_data'] = $basic_data;
+        $this->view_data['actual_data'] = $actual_data;
 
-        $this->view_data['obtain_conditions'] = $obtain_conditions;
-        $this->view_data['type'] = $info->type;
-        $this->view_data['prize_attribute'] = $prize_attribute;
+        return view('finance.account-record-details', $this->view_data);
+    }
 
-        return view('prize.details', $this->view_data);
+    public function uploadBasicData(Request $request)
+    {
+        return $this->success('aaaa');
+    }
+
+    public function uploadActualData(Request $request)
+    {
+        return $this->success('bbbb');
     }
 
     public function winning_record(Request $request)

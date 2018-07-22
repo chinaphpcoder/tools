@@ -42,7 +42,7 @@
                     shade: 0.8,
                     area: ['420px','600px'],
                     scrollbar: false,
-                    content: ["{{ route('activity.prize.details') }}?id="+ data.id,'no'] //iframe的url
+                    content: ["{{ route('finance.account-record-details') }}?id="+ data.id,'no'] //iframe的url
                 });
             }
         });
