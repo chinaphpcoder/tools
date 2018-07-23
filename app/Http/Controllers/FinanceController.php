@@ -161,7 +161,23 @@ class FinanceController extends Controller
 
     public function uploadBasicData(Request $request)
     {
-        return $this->success('aaaa');
+        if ($_FILES["file"]["error"] > 0)
+        {
+            return $this->error($_FILES["file"]["error"]);
+        }
+
+        $file_name = $_FILES["file"]["name"];
+        $tmp_name = $_FILES["file"]["tmp_name"];
+
+        if( $file_name == null ) {
+            return $this->error('原文件名为空');
+        }
+
+        if( $tmp_name == null ) {
+            return $this->error('临时文件不存在');
+        }
+
+        return $this->success('ok',json_encode($_FILES));
     }
 
     public function uploadActualData(Request $request)

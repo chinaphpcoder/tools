@@ -120,7 +120,8 @@
             //,multiple: true
             ,bindAction: '#upload-basic-submit'
             ,done: function(res){
-                console.log(res)
+                console.log(res);
+                layer.msg(res.msg);
             }
         });
 
