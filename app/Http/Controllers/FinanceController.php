@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DB;
-use PHPExcel;
-use PHPExcel_IOFactory;
-use PHPExcel_Style_Alignment;
-use PHPExcel_Style_Border;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
 class FinanceController extends Controller
 {
@@ -152,6 +150,8 @@ class FinanceController extends Controller
         $actual_data[] = ['key' => '数据条数', 'value' => $actual_info['count'] == null ? 0 : $actual_info['count'] ];
         $actual_data[] = ['key' => '总金额(元)', 'value' => $actual_info['total_amount'] == null ? 0 : $actual_info['total_amount'] ];
 
+        $this->view_data['business_identity_id'] = $business_identity_id;
+
         $this->view_data['overall_data'] = $overall_data;
         $this->view_data['basic_data'] = $basic_data;
         $this->view_data['actual_data'] = $actual_data;
@@ -166,6 +166,8 @@ class FinanceController extends Controller
             return $this->error($_FILES["file"]["error"]);
         }
 
+        $business_identity_id = $request->input('business_identity_id');
+
         $file_name = $_FILES["file"]["name"];
         $tmp_name = $_FILES["file"]["tmp_name"];
 
@@ -177,7 +179,62 @@ class FinanceController extends Controller
             return $this->error('临时文件不存在');
         }
 
-        return $this->success('ok',json_encode($_FILES));
+        $reader = new Xlsx();
+        $spreadsheet = $reader->load($tmp_name);
+
+        $sheet        = $spreadsheet->getSheet(0); // 读取第一個工作表
+        $total_row    = $sheet->getHighestRow(); // 取得总行数
+        $total_column = $sheet->getHighestColumn(); // 取得总列数
+        $result = ['row' => $total_row , 'column' => $total_column];
+
+        for ($row = 2; $row <= $total_row; $row++) //行号从1开始
+        {
+            $request_no = $sheet->getCell('A' . $row)->getValue();
+            $amount = $sheet->getCell('B' . $row)->getValue();
+            $bill_info = DB::table('bill_detail_log')
+                    ->where('request_no','=',$request_no)
+                    ->where('business_identity_id','=',$business_identity_id)
+                    ->first();
+            if($bill_info == null ) {
+                $insert_data = [
+                    'business_identity_id' => $business_identity_id,
+                    'request_no' => $request_no,
+                    'base_amount' => $amount,
+                    'status' => 2,
+                ];
+                $id = DB::table('bill_detail_log')
+                    ->insert($insert_data);
+                if ( $id <= 0 ) {
+                    return $this->error('添加失败');
+                }
+            } else {
+                if( $bill_info->account_amount == 0 ) {
+                    $status = 2;
+                } elseif ($bill_info->account_amount == $amount) {
+                    $status = 1;
+                } else {
+                    $status = 4;
+                }
+                $result = DB::table('bill_detail_log')
+                            ->where('id','=',$bill_info->id)
+                            ->update(
+                                [
+                                    'base_amount' => $amount,
+                                    'status' => $status,
+                                ]
+                            );
+                if($result === false) {
+                    return $this->error('更新失败');
+                }
+
+            }
+        }
+
+        //$result['data'] = $data;
+
+        //$sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+
+        return $this->success('处理成功');
     }
 
     public function uploadActualData(Request $request)
