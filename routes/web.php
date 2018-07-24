@@ -217,3 +217,5 @@ Route::post('/finance/add-account-record','FinanceController@addAccountRecord')-
 Route::get('/finance/account-record-details','FinanceController@accountRecordDetails')->middleware('auth')->name('finance.account-record-details');
 Route::post('/finance/upload-basic-data','FinanceController@uploadBasicData')->middleware('auth')->name('finance.upload-basic-data');
 Route::post('/finance/upload-actual-data','FinanceController@uploadActualData')->middleware('auth')->name('finance.upload-actual-data');
+
+Route::get('/finance/show-error-data','FinanceController@showErrorData')->middleware('auth')->name('finance.show-error-data');

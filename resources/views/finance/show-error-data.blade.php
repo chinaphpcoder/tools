@@ -1,28 +1,15 @@
-@extends('public.base')
-
-@section('css')
-<link rel="stylesheet" href="{{ asset('layui/css/layui.css') }}"  media="all">
-@endsection
-
-@section('content')
-    <section class="content-header">
-        <h1>
-            {{$meta_title}}
-        </h1>
-        <ol class="breadcrumb">
-            <li><a href="{{route('home')}}"><i class="fa fa-dashboard"></i>首页</a></li>
-            <li class="active">{{$meta_title}}</li>
-        </ol>
-    </section>
-    <section class="content">
-        <div class="layui-btn-group demoTable">
-            <button class="layui-btn" data-type="getCheckData" onclick="add_record()">新增业务对账</button>
-        </div>
-        <table id="test" class="layui-table" lay-filter="demo" style="width: 90%"></table>
-    </section>
-@endsection
-
-@section('javascript')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_token" content="{!! csrf_token() !!}"/>
+    <meta name="business_identity_id" content="{{ $business_identity_id }}"/>
+    <title>对账错误数据</title>
+    <link rel="stylesheet" href="{{ asset('layui/css/layui.css') }}"  media="all">
+</head>
+<body>
+    <table id="test" class="layui-table" lay-filter="demo" style="width: 90%"></table>
+</body>
 
 <script src="{{ asset('layui/layui.js') }}" charset="utf-8"></script>
  
@@ -35,15 +22,38 @@
         table.on('tool(demo)', function(obj){
             var data = obj.data;
             if(obj.event === 'detail'){
-                layer.open({
+                var index = layer.open({
                     type: 2,
                     title: '查看详情',
                     shadeClose: true,
                     shade: 0.8,
-                    area: ['420px','600px'],
+                    area: ['600px','650px'],
                     scrollbar: false,
                     content: ["{{ route('finance.account-record-details') }}?id="+ data.id,'no'] //iframe的url
                 });
+                layer.full(index);
+            } else if(obj.event === 'show-all-data'){
+                var index = layer.open({
+                    type: 2,
+                    title: '查看详情',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['600px','650px'],
+                    scrollbar: false,
+                    content: ["{{ route('finance.account-record-details') }}?id="+ data.id,'no'] //iframe的url
+                });
+                layer.full(index);
+            } else if(obj.event === 'show-error-data'){
+                var index = layer.open({
+                    type: 2,
+                    title: '查看详情',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['600px','650px'],
+                    scrollbar: false,
+                    content: ["{{ route('finance.show-error-data') }}?id="+ data.id,'no'] //iframe的url
+                });
+                layer.full(index);
             }
         });
       
@@ -90,8 +100,3 @@
 
 </script>
 
-<script type="text/html" id="barDemo">
-    <a class="layui-btn layui-btn-sm" lay-event="detail">查看详情</a>
-</script>
-
-@endsection

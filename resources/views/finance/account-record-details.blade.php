@@ -122,7 +122,11 @@
             ,bindAction: '#upload-basic-submit'
             ,done: function(res){
                 console.log(res);
-                layer.msg(res.msg);
+                layer.msg(res.msg
+                        ,{time:500}
+                        ,function(){
+                            location.reload();
+                        });
             }
         });
 
@@ -136,7 +140,12 @@
             //,multiple: true
             ,bindAction: '#upload-actual-submit'
             ,done: function(res){
-                console.log(res)
+                console.log(res);
+                layer.msg(res.msg
+                        ,{time:500}
+                        ,function(){
+                            location.reload();
+                        });
             }
         });
 
