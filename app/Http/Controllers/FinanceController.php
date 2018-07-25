@@ -74,7 +74,6 @@ class FinanceController extends Controller
     }
     public function updateAccountRecord(Request $request)
     {
-        return $this->error(json_encode($_POST));
         $business_alias = $request->input('business_alias','');
         $ymd = date("Ymd");
         $pre_business_identity = DB::table('bill_record')
