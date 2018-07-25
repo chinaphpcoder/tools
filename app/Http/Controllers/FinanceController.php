@@ -44,7 +44,7 @@ class FinanceController extends Controller
         $limit_start = ($page - 1) * $limit;
 
         $total_count = DB::table('bill_record')->count();
-        $statuses = [ 0=>'未上传数据'];
+        $statuses = [ 0=>'未上传数据',1=>'已上传基准数据',2=>'已上传实际数据',3=>'平账',4=>'不平账',];
         $lists = DB::table('bill_record')
             ->join('users', 'bill_record.user_id', '=', 'users.id')
             ->select(['bill_record.id','users.name','bill_record.business_identity','business_alias','bill_record.status','bill_record.created_at'])
@@ -100,23 +100,6 @@ class FinanceController extends Controller
         }
         return $this->success('添加成功');
     }
-    public function probability_update(Request $request){
-
-        $id = $request->input('id');
-        $obtain_probability = $request->input('obtain_probability');
-        if($obtain_probability <0 || $obtain_probability > 100) {
-            return $this->error('中奖概率须在0-100之间');
-        }
-        $obtain_probability = (int)floor($obtain_probability * 100 );
-
-        $status = DB::connection('vault')->table('vault_activity_prize')->where('id','=',$id)->update(['obtain_probability' => $obtain_probability]);
-        if($status === false) {
-            return $this->error('更新失败');
-        }
-
-        return $this->success('更新成功');
-
-    }
 
     public function accountRecordDetails(Request $request)
     {
@@ -125,7 +108,7 @@ class FinanceController extends Controller
                 ->where('id','=',$id)
                 ->first();
         $info = json_decode(json_encode($info),true);
-        $statuses = [ 0=>'未上传数据'];
+        $statuses = [ 0=>'未上传数据',1=>'已上传基准数据',2=>'已上传实际数据',3=>'平账',4=>'不平账',];
         $overall_data = [];
         $overall_data[] = ['key' => '业务名称', 'value' => $info['business_alias'] ];
         $overall_data[] = ['key' => '业务标识', 'value' => $info['business_identity'] ];
@@ -282,6 +265,34 @@ class FinanceController extends Controller
 
         DB::commit();
 
+        //更新对账状态
+        $record_info = DB::table('bill_record')
+                        ->where('id','=',$business_identity_id)
+                        ->first();
+        if($record_info->status == 0) {
+            $bill_status = 1;
+        } elseif($record_info->status == 2 || $record_info->status == 3 || $record_info->status == 4) {
+            $error_num = DB::table('bill_detail_log')
+                ->where('business_identity_id','=',$business_identity_id)
+                ->where('status','!=',1)
+                ->count();
+            if($error_num == 0) {
+                $bill_status = 3;
+            } else {
+                $bill_status = 4;
+            }
+            
+        }
+        if(isset($bill_status)) {
+            DB::table('bill_record')
+                ->where('id','=',$business_identity_id)
+                ->update(
+                        [
+                            'status' => $bill_status,
+                        ]
+                    );
+        }
+
         return $this->success("{$count}条数据");
     }
 
@@ -401,6 +412,32 @@ class FinanceController extends Controller
             }
         }
         DB::commit();
+        //更新对账状态
+        $record_info = DB::table('bill_record')
+                        ->where('id','=',$business_identity_id)
+                        ->first();
+        if($record_info->status == 0) {
+            $bill_status = 2;
+        } elseif($record_info->status == 1 || $record_info->status == 3 || $record_info->status == 4) {
+            $error_num = DB::table('bill_detail_log')
+                ->where('business_identity_id','=',$business_identity_id)
+                ->where('status','!=',1)
+                ->count();
+            if($error_num == 0) {
+                $bill_status = 3;
+            } else {
+                $bill_status = 4;
+            }
+        }
+        if(isset($bill_status)) {
+            DB::table('bill_record')
+                ->where('id','=',$business_identity_id)
+                ->update(
+                        [
+                            'status' => $bill_status,
+                        ]
+                    );
+        }
 
         //$result['data'] = $data;
 

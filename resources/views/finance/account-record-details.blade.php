@@ -191,7 +191,7 @@
         });
 
         //选完文件后不自动上传
-        upload.render({
+        var uploadActual = upload.render({
             elem: '#upload-actual-select'
             ,url: '{{ route("finance.upload-actual-data") }}?business_identity_id={{ $business_identity_id }}'
             ,headers: { 'X-CSRF-Token' : $('meta[name=_token]').attr('content') }
@@ -201,10 +201,10 @@
             //,multiple: true
             ,bindAction: '#upload-actual-submit'
             ,before: function(obj){ 
-                uploadBasic.config.data.header = $("[name='upload-actual-header']").prop("checked") ? '1' : '0';
-                uploadBasic.config.data.column_request_no = $("[name='upload-actual-request-no']").val();
-                uploadBasic.config.data.column_amount = $("[name='upload-actual-amount']").val();
-                uploadBasic.config.data.trim_string = $("[name='upload-actual-trim']").val();
+                uploadActual.config.data.header = $("[name='upload-actual-header']").prop("checked") ? '1' : '0';
+                uploadActual.config.data.column_request_no = $("[name='upload-actual-request-no']").val();
+                uploadActual.config.data.column_amount = $("[name='upload-actual-amount']").val();
+                uploadActual.config.data.trim_string = $("[name='upload-actual-trim']").val();
             }
             ,done: function(res){
                 console.log(res);
