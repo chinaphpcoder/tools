@@ -215,6 +215,12 @@ class FinanceController extends Controller
             } else {
                 $request_no = trim($request_no,$trim_string." \r\n");
             }
+	    if($request_no == null){
+	        continue;
+            }
+            if($amount == 0){
+                $amount = 0;
+            }
             $bill_info = DB::table('bill_detail_log')
                     ->where('request_no','=',$request_no)
                     ->where('business_identity_id','=',$business_identity_id)
@@ -365,6 +371,13 @@ class FinanceController extends Controller
             } else {
                 $request_no = trim($request_no,$trim_string." \r\n");
             }
+	    if($request_no == null){
+	        continue;
+            }
+            if($amount == 0){
+                $amount = 0;
+            }
+        
             $bill_info = DB::table('bill_detail_log')
                     ->where('request_no','=',$request_no)
                     ->where('business_identity_id','=',$business_identity_id)
