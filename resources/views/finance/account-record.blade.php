@@ -46,18 +46,9 @@
                 });
                 layer.full(index);
             } else if(obj.event === 'show-all-data'){
-                var index = layer.open({
-                    type: 2,
-                    title: '查看详情',
-                    shadeClose: true,
-                    shade: 0.8,
-                    area: ['600px','650px'],
-                    scrollbar: false,
-                    content: ["{{ route('finance.account-record-details') }}?id="+ data.id,'no'] //iframe的url
-                });
-                layer.full(index);
+                window.open("{{ route('finance.show-data') }}?id="+ data.id+'&type=0',"_blank");
             } else if(obj.event === 'show-error-data'){
-                window.open("{{ route('finance.show-error-data') }}?id="+ data.id+'&type=1',"_blank");
+                window.open("{{ route('finance.show-data') }}?id="+ data.id+'&type=1',"_blank");
             }
         });
       
@@ -73,7 +64,7 @@
                 ,{field:'status_text', title: '状态'}
                 ,{field:'created_at',title: '创建时间'}
                 ,{field:'name',title: '创建人'}
-                ,{field:'op', title: '操作',toolbar: '#barDemo'}
+                ,{field:'op', title: '操作',toolbar: '#barDemo',width: 250}
             ]]
             ,page: true
         });
@@ -107,7 +98,7 @@
 <script type="text/html" id="barDemo">
     <a class="layui-btn layui-btn-sm" lay-event="detail">查看详情</a>
     <a class="layui-btn layui-btn-sm" lay-event="show-error-data">错误数据</a>
-    <!-- <a class="layui-btn layui-btn-sm" lay-event="show-all-data">所有数据</a> -->
+    <a class="layui-btn layui-btn-sm" lay-event="show-all-data">所有数据</a>
 </script>
 
 @endsection

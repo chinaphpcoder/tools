@@ -179,6 +179,27 @@ class FinanceController extends Controller
             return $this->error('临时文件不存在');
         }
 
+        $header = $request->input('header');
+        if($header == 1) {
+            $start_row = 2;
+        } else {
+            $start_row = 1;
+        }
+        $column_request_no = $request->input('column_request_no','');
+        if( $column_request_no == '') {
+            $column_request_no = 'A';
+        } else {
+            $column_request_no = trim(strtoupper($column_request_no));
+        }
+        $column_amount = $request->input('column_amount','');
+        if( $column_amount == '') {
+            $column_amount = 'B';
+        } else {
+            $column_amount = trim(strtoupper($column_amount));
+        }
+        $trim_string = $request->input('trim_string','');
+        $trim_string = trim($trim_string);
+        
         $reader = new Xlsx();
         $spreadsheet = $reader->load($tmp_name);
 
@@ -191,10 +212,15 @@ class FinanceController extends Controller
 
         $count = 0;
 
-        for ($row = 2; $row <= $total_row; $row++) //行号从1开始
+        for ($row = $start_row; $row <= $total_row; $row++) //行号从1开始
         {
-            $request_no = $sheet->getCell('A' . $row)->getValue();
-            $amount = $sheet->getCell('B' . $row)->getValue();
+            $request_no = $sheet->getCell($column_request_no . $row)->getValue();
+            $amount = $sheet->getCell($column_amount . $row)->getValue();
+            if($trim_string == '') {
+                $request_no = trim($request_no);
+            } else {
+                $request_no = trim($request_no,$trim_string." \r\n");
+            }
             $bill_info = DB::table('bill_detail_log')
                     ->where('request_no','=',$request_no)
                     ->where('business_identity_id','=',$business_identity_id)
@@ -267,6 +293,27 @@ class FinanceController extends Controller
             return $this->error('临时文件不存在');
         }
 
+        $header = $request->input('header');
+        if($header == 1) {
+            $start_row = 2;
+        } else {
+            $start_row = 1;
+        }
+        $column_request_no = $request->input('column_request_no','');
+        if( $column_request_no == '') {
+            $column_request_no = 'A';
+        } else {
+            $column_request_no = trim(strtoupper($column_request_no));
+        }
+        $column_amount = $request->input('column_amount','');
+        if( $column_amount == '') {
+            $column_amount = 'B';
+        } else {
+            $column_amount = trim(strtoupper($column_amount));
+        }
+        $trim_string = $request->input('trim_string','');
+        $trim_string = trim($trim_string);
+        
         $reader = new Xlsx();
         $spreadsheet = $reader->load($tmp_name);
 
@@ -275,10 +322,27 @@ class FinanceController extends Controller
         $total_column = $sheet->getHighestColumn(); // 取得总列数
         $result = ['row' => $total_row , 'column' => $total_column];
 
-        for ($row = 2; $row <= $total_row; $row++) //行号从1开始
+        $reader = new Xlsx();
+        $spreadsheet = $reader->load($tmp_name);
+
+        $sheet        = $spreadsheet->getSheet(0); // 读取第一個工作表
+        $total_row    = $sheet->getHighestRow(); // 取得总行数
+        $total_column = $sheet->getHighestColumn(); // 取得总列数
+        $result = ['row' => $total_row , 'column' => $total_column];
+
+        DB::beginTransaction();
+
+        $count = 0;
+
+        for ($row = $start_row; $row <= $total_row; $row++) //行号从1开始
         {
-            $request_no = $sheet->getCell('A' . $row)->getValue();
-            $amount = $sheet->getCell('B' . $row)->getValue();
+            $request_no = $sheet->getCell($column_request_no . $row)->getValue();
+            $amount = $sheet->getCell($column_amount . $row)->getValue();
+            if($trim_string == '') {
+                $request_no = trim($request_no);
+            } else {
+                $request_no = trim($request_no,$trim_string." \r\n");
+            }
             $bill_info = DB::table('bill_detail_log')
                     ->where('request_no','=',$request_no)
                     ->where('business_identity_id','=',$business_identity_id)
@@ -293,6 +357,7 @@ class FinanceController extends Controller
                 $id = DB::table('bill_detail_log')
                     ->insert($insert_data);
                 if ( $id <= 0 ) {
+                    DB::rollBack();
                     return $this->error('添加失败');
                 }
             } else {
@@ -312,11 +377,18 @@ class FinanceController extends Controller
                                 ]
                             );
                 if($result === false) {
+                    DB::rollBack();
                     return $this->error('更新失败');
                 }
 
             }
+            $count++;
+            if( $count % 5000 == 0 ) {
+                DB::commit();
+                DB::beginTransaction();
+            }
         }
+        DB::commit();
 
         //$result['data'] = $data;
 
@@ -325,7 +397,7 @@ class FinanceController extends Controller
         return $this->success('处理成功');
     }
 
-    public function showErrorData(Request $request)
+    public function showData(Request $request)
     {
         $business_identity_id = $request->input('id');
         $type = $request->input('type');
@@ -340,7 +412,7 @@ class FinanceController extends Controller
         return view('finance.show-error-data', $this->view_data);
     }
 
-    public function getErrorData(Request $request)
+    public function getData(Request $request)
     {
         $business_identity_id = $request->input('business_identity_id');
         $type = $request->input('type');
