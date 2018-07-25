@@ -16,7 +16,7 @@
     </section>
     <section class="content">
         <div class="layui-btn-group demoTable">
-            <button class="layui-btn" data-type="getCheckData" onclick="add_record()">新增业务对账</button>
+            <button class="layui-btn" data-type="getCheckData" onclick="show_add_record()">新增业务对账</button>
         </div>
         <table id="test" class="layui-table" lay-filter="demo" style="width: 90%"></table>
     </section>
@@ -61,6 +61,7 @@
             ,cols: [[
                 {field:'pid', title: '序号'}
                 ,{field:'business_identity', title: '业务标识'}
+                ,{field:'business_alias', title: '业务名称'}
                 ,{field:'status_text', title: '状态'}
                 ,{field:'created_at',title: '创建时间'}
                 ,{field:'name',title: '创建人'}
@@ -90,6 +91,18 @@
                 layer.alert('系统异常');
             }
         });
+    }
+
+    function show_add_record() {
+        var index = layer.open({
+                    type: 2,
+                    title: '新增业务对账',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['400px','200px'],
+                    scrollbar: false,
+                    content: ["{{ route('finance.add-account-record') }}"]
+                });
     }
 
 

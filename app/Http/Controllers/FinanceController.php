@@ -47,7 +47,7 @@ class FinanceController extends Controller
         $statuses = [ 0=>'未上传数据'];
         $lists = DB::table('bill_record')
             ->join('users', 'bill_record.user_id', '=', 'users.id')
-            ->select(['bill_record.id','users.name','bill_record.business_identity','bill_record.status','bill_record.created_at'])
+            ->select(['bill_record.id','users.name','bill_record.business_identity','business_alias','bill_record.status','bill_record.created_at'])
             ->orderBy('bill_record.id', 'desc')
             ->offset($limit_start)
             ->limit($limit)
@@ -69,6 +69,13 @@ class FinanceController extends Controller
 
     public function addAccountRecord(Request $request)
     {
+        $this->view_data['meta_title'] = '业务对账记录';
+        return view('finance.add-account-record', $this->view_data);
+    }
+    public function updateAccountRecord(Request $request)
+    {
+        return $this->error(json_encode($_POST));
+        $business_alias = $request->input('business_alias','');
         $ymd = date("Ymd");
         $pre_business_identity = DB::table('bill_record')
                     ->where('business_identity','like',"{$ymd}%")
@@ -81,6 +88,7 @@ class FinanceController extends Controller
         
         $insert_data = [
             'business_identity' => $business_identity,
+            'business_alias' => $business_alias,
             'status' => 0,
             'user_id' => Auth::id(),
         ];
@@ -92,7 +100,6 @@ class FinanceController extends Controller
         }
         return $this->success('添加成功');
     }
-
     public function probability_update(Request $request){
 
         $id = $request->input('id');
@@ -478,10 +485,10 @@ class FinanceController extends Controller
                 $status = [2,3,4];
             }
 
-            // $total_count = DB::table('bill_detail_log')
-            //                     ->where('business_identity_id','=',$business_identity_id)
-            //                     ->whereIn('status',$status)
-            //                     ->count();
+            $record_info = DB::table('bill_record')
+                                ->where('id','=',$business_identity_id)
+                                ->first();
+            $file_name = $record_info->business_alias.'-'.$record_info->business_identity.".xlsx";
             $statuses = [ 1=>'平账',2=>'长款',3=>'短款',4=>'存疑'];
             $lists = DB::table('bill_detail_log')
                         ->where('business_identity_id','=',$business_identity_id)
@@ -510,7 +517,7 @@ class FinanceController extends Controller
 
         } finally{
             ini_set('memory_limit', '1280M');
-            $file_name = $business_identity_id.".xlsx";
+            // $file_name = $business_identity_id.".xlsx";
             $sheet = "Sheet1";
             $phpexcel = new PHPExcel();
             $phpexcel->getProperties()
@@ -525,16 +532,16 @@ class FinanceController extends Controller
             $phpexcel->getDefaultStyle()->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
 
             $phpexcel->getActiveSheet()->getColumnDimension('A')->setWidth(10);
-            $phpexcel->getActiveSheet()->getColumnDimension('B')->setWidth(50);
-            $phpexcel->getActiveSheet()->getColumnDimension('D')->setWidth(10);
+            $phpexcel->getActiveSheet()->getColumnDimension('B')->setWidth(40);
+            $phpexcel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
             $phpexcel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
             $phpexcel->getActiveSheet()->getColumnDimension('E')->setWidth(30);
 
             $phpexcel->getActiveSheet()->fromArray($xls_data,null,'A1',true);
             $phpexcel->getActiveSheet()->setTitle($sheet);
             $row = count($xls_data);
-            // $phpexcel->getActiveSheet()->getStyle("A1:E{$row}")->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
-            // $phpexcel->getActiveSheet()->getStyle("A1:E1")->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+            //$phpexcel->getActiveSheet()->getStyle("A1:E{$row}")->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+            //$phpexcel->getActiveSheet()->getStyle("A1:E1")->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
             $phpexcel->setActiveSheetIndex(0);
             $objwriter = PHPExcel_IOFactory::createWriter($phpexcel, 'Excel2007');
             header('Content-Type: application/vnd.ms-excel');
