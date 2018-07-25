@@ -57,16 +57,7 @@
                 });
                 layer.full(index);
             } else if(obj.event === 'show-error-data'){
-                var index = layer.open({
-                    type: 2,
-                    title: '查看详情',
-                    shadeClose: true,
-                    shade: 0.8,
-                    area: ['600px','650px'],
-                    scrollbar: false,
-                    content: ["{{ route('finance.show-error-data') }}?id="+ data.id,'no'] //iframe的url
-                });
-                layer.full(index);
+                window.open("{{ route('finance.show-error-data') }}?id="+ data.id+'&type=1',"_blank");
             }
         });
       
@@ -74,7 +65,7 @@
             elem: '#test'
             ,url:'{{ route("finance.get-account-record") }}'
             //,width: '100%' //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-            ,cellMinWidth: 100
+            ,cellMinWidth: 50
             ,size:'lg'
             ,cols: [[
                 {field:'pid', title: '序号'}

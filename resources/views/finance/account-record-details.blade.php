@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="_token" content="{!! csrf_token() !!}"/>
-    <meta name="business_identity_id" content="{{ $business_identity_id }}"/>
     <title>修改中奖概率</title>
     <link rel="stylesheet" href="{{ asset('layui/css/layui.css') }}"  media="all">
 </head>
@@ -114,7 +113,7 @@
         //选完文件后不自动上传
         upload.render({
             elem: '#upload-basic-select'
-            ,url: '{{ route("finance.upload-basic-data") }}?business_identity_id=' + $('meta[name=business_identity_id]').attr('content')
+            ,url: '{{ route("finance.upload-basic-data") }}?business_identity_id={{ $business_identity_id }}'
             ,headers: { 'X-CSRF-Token' : $('meta[name=_token]').attr('content') }
             ,auto: false
             ,accept:'file'
@@ -133,7 +132,7 @@
         //选完文件后不自动上传
         upload.render({
             elem: '#upload-actual-select'
-            ,url: '{{ route("finance.upload-actual-data") }}?business_identity_id=' + $('meta[name=business_identity_id]').attr('content')
+            ,url: '{{ route("finance.upload-actual-data") }}?business_identity_id={{ $business_identity_id }}'
             ,headers: { 'X-CSRF-Token' : $('meta[name=_token]').attr('content') }
             ,auto: false
             ,accept:'file'

@@ -219,3 +219,4 @@ Route::post('/finance/upload-basic-data','FinanceController@uploadBasicData')->m
 Route::post('/finance/upload-actual-data','FinanceController@uploadActualData')->middleware('auth')->name('finance.upload-actual-data');
 
 Route::get('/finance/show-error-data','FinanceController@showErrorData')->middleware('auth')->name('finance.show-error-data');
+Route::get('/finance/get-error-data','FinanceController@getErrorData')->middleware('auth')->name('finance.get-error-data');

@@ -187,6 +187,10 @@ class FinanceController extends Controller
         $total_column = $sheet->getHighestColumn(); // 取得总列数
         $result = ['row' => $total_row , 'column' => $total_column];
 
+        DB::beginTransaction();
+
+        $count = 0;
+
         for ($row = 2; $row <= $total_row; $row++) //行号从1开始
         {
             $request_no = $sheet->getCell('A' . $row)->getValue();
@@ -205,6 +209,7 @@ class FinanceController extends Controller
                 $id = DB::table('bill_detail_log')
                     ->insert($insert_data);
                 if ( $id <= 0 ) {
+                    DB::rollBack();
                     return $this->error('添加失败');
                 }
             } else {
@@ -224,17 +229,22 @@ class FinanceController extends Controller
                                 ]
                             );
                 if($result === false) {
+                    DB::rollBack();
                     return $this->error('更新失败');
                 }
 
             }
+            $count++;
+            if( $count % 5000 == 0 ) {
+                DB::commit();
+                DB::beginTransaction();
+            }
+
         }
 
-        //$result['data'] = $data;
+        DB::commit();
 
-        //$sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-
-        return $this->success('处理成功');
+        return $this->success("{$count}条数据");
     }
 
     public function uploadActualData(Request $request)
@@ -317,17 +327,65 @@ class FinanceController extends Controller
 
     public function showErrorData(Request $request)
     {
-        //判断权限
-        $check = $this->check_user();
-        if ($check !== true) {
-            $admin = 0;
-        } else {
-            $admin = 1;
+        $business_identity_id = $request->input('id');
+        $type = $request->input('type');
+
+        if($type == 0) {
+            $type = 0;
         }
 
         $this->view_data['meta_title'] = '业务对账记录';
-        $this->view_data['admin'] = $admin;
+        $this->view_data['type'] = $type;
+        $this->view_data['business_identity_id'] = $business_identity_id;
         return view('finance.show-error-data', $this->view_data);
+    }
+
+    public function getErrorData(Request $request)
+    {
+        $business_identity_id = $request->input('business_identity_id');
+        $type = $request->input('type');
+        if($type == 0 ) {
+            $status = [1,2,3,4];
+        } elseif($type == 1 ) {
+            $status = [2,3,4];
+        }
+        $page = $request->input('page');
+        $limit = $request->input('limit');
+        if($page <= 1) {
+            $page = 1;
+        }
+        if($limit <= 1) {
+            $limit = 10;
+        }
+
+        $limit_start = ($page - 1) * $limit;
+
+        $total_count = DB::table('bill_detail_log')
+                            ->where('business_identity_id','=',$business_identity_id)
+                            ->whereIn('status',$status)
+                            ->count();
+        $statuses = [ 1=>'平账',2=>'长款',3=>'短款',4=>'存疑'];
+        $lists = DB::table('bill_detail_log')
+                    ->where('business_identity_id','=',$business_identity_id)
+                    ->whereIn('status',$status)
+                    ->select(['request_no','base_amount','account_amount','status'])
+                    ->orderBy('id', 'desc')
+                    ->offset($limit_start)
+                    ->limit($limit)
+                    ->get();
+        $lists = json_decode(json_encode($lists),true);
+        $count = $limit_start + 1;
+        foreach ($lists as $key=>$value) {
+            $lists[$key]['pid'] = $count;
+            $lists[$key]['status_text'] = $statuses[$value['status']];
+            $count++;
+        }
+        $result = [];
+        $result['code'] = 0;
+        $result['msg'] = '';
+        $result['count'] = $total_count;
+        $result['data'] = $lists;
+        return $result;
     }
 
     public function success($msg='success',$data='',$code='200'){
