@@ -42,7 +42,7 @@
                     shade: 0.8,
                     area: ['600px','650px'],
                     scrollbar: false,
-                    content: ["{{ route('finance.account-record-details') }}?id="+ data.id,'no'] //iframe的url
+                    content: "{{ route('finance.account-record-details') }}?id="+ data.id
                 });
                 layer.full(index);
             } else if(obj.event === 'show-all-data'){
