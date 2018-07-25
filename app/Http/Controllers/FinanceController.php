@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DB;
+use PHPExcel;
+use PHPExcel_IOFactory;
+use PHPExcel_Style_Alignment;
+use PHPExcel_Style_Border;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
@@ -409,7 +413,7 @@ class FinanceController extends Controller
         $this->view_data['meta_title'] = '业务对账记录';
         $this->view_data['type'] = $type;
         $this->view_data['business_identity_id'] = $business_identity_id;
-        return view('finance.show-error-data', $this->view_data);
+        return view('finance.show-data', $this->view_data);
     }
 
     public function getData(Request $request)
@@ -441,7 +445,7 @@ class FinanceController extends Controller
                     ->where('business_identity_id','=',$business_identity_id)
                     ->whereIn('status',$status)
                     ->select(['request_no','base_amount','account_amount','status'])
-                    ->orderBy('id', 'desc')
+                    ->orderBy('id', 'asc')
                     ->offset($limit_start)
                     ->limit($limit)
                     ->get();
@@ -458,6 +462,87 @@ class FinanceController extends Controller
         $result['count'] = $total_count;
         $result['data'] = $lists;
         return $result;
+    }
+
+    public function exportData(Request $request)
+    {
+        $xls_data = [];
+        $xls_data[] = ['序号','流水号','基准金额','实际金额','对账状态'];
+        try{
+
+            $business_identity_id = $request->input('business_identity_id');
+            $type = $request->input('type');
+            if($type == 0 ) {
+                $status = [1,2,3,4];
+            } elseif($type == 1 ) {
+                $status = [2,3,4];
+            }
+
+            // $total_count = DB::table('bill_detail_log')
+            //                     ->where('business_identity_id','=',$business_identity_id)
+            //                     ->whereIn('status',$status)
+            //                     ->count();
+            $statuses = [ 1=>'平账',2=>'长款',3=>'短款',4=>'存疑'];
+            $lists = DB::table('bill_detail_log')
+                        ->where('business_identity_id','=',$business_identity_id)
+                        ->whereIn('status',$status)
+                        ->select(['request_no','base_amount','account_amount','status'])
+                        ->orderBy('id', 'asc')
+                        // ->offset($limit_start)
+                        // ->limit($limit)
+                        ->get();
+            $lists = json_decode(json_encode($lists),true);
+
+            $xls_data = [];
+            $xls_data[] = ['序号','流水号','基准金额','实际金额','对账状态'];
+            $count = 1;
+            foreach ($lists as $key=>$value) {
+                $tmp_data = [];
+                $tmp_data[] = $count;
+                $tmp_data[] = $value['request_no'] ;
+                $tmp_data[] = $value['base_amount'] ;
+                $tmp_data[] = $value['account_amount'] ;
+                $tmp_data[] = $statuses[$value['status']];
+                $count++;
+                $xls_data[] = $tmp_data;
+            }
+        } catch(\Exception $e) {
+
+        } finally{
+            ini_set('memory_limit', '1280M');
+            $file_name = $business_identity_id.".xlsx";
+            $sheet = "Sheet1";
+            $phpexcel = new PHPExcel();
+            $phpexcel->getProperties()
+                ->setCreator("shaxiaoseng php")
+                ->setLastModifiedBy("shaxiaoseng php")
+                ->setTitle("shaxiaoseng php document")
+                ->setSubject("shaxiaoseng php document")
+                ->setDescription("shaxiaoseng php")
+                ->setKeywords("shaxiaoseng php")
+                ->setCategory("shaxiaoseng php");
+            $phpexcel->getDefaultStyle()->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+            $phpexcel->getDefaultStyle()->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+
+            $phpexcel->getActiveSheet()->getColumnDimension('A')->setWidth(10);
+            $phpexcel->getActiveSheet()->getColumnDimension('B')->setWidth(50);
+            $phpexcel->getActiveSheet()->getColumnDimension('D')->setWidth(10);
+            $phpexcel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
+            $phpexcel->getActiveSheet()->getColumnDimension('E')->setWidth(30);
+
+            $phpexcel->getActiveSheet()->fromArray($xls_data,null,'A1',true);
+            $phpexcel->getActiveSheet()->setTitle($sheet);
+            $row = count($xls_data);
+            // $phpexcel->getActiveSheet()->getStyle("A1:E{$row}")->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+            // $phpexcel->getActiveSheet()->getStyle("A1:E1")->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+            $phpexcel->setActiveSheetIndex(0);
+            $objwriter = PHPExcel_IOFactory::createWriter($phpexcel, 'Excel2007');
+            header('Content-Type: application/vnd.ms-excel');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . $file_name . '"');
+            header('Cache-Control: max-age=0');
+            $objwriter->save('php://output');
+        }
     }
 
     public function success($msg='success',$data='',$code='200'){
