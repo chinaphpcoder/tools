@@ -127,6 +127,7 @@ class FinanceController extends Controller
         $info = json_decode(json_encode($info),true);
         $statuses = [ 0=>'未上传数据'];
         $overall_data = [];
+        $overall_data[] = ['key' => '业务名称', 'value' => $info['business_alias'] ];
         $overall_data[] = ['key' => '业务标识', 'value' => $info['business_identity'] ];
         $overall_data[] = ['key' => '总体进度', 'value' => $statuses[$info['status']] ];
         $overall_data[] = ['key' => '创建时间', 'value' => $info['created_at'] ];
@@ -417,7 +418,13 @@ class FinanceController extends Controller
             $type = 0;
         }
 
-        $this->view_data['meta_title'] = '业务对账记录';
+        $types = [ 0=>'全部记录' , 1 => '错误记录'];
+
+        $record_info = DB::table('bill_record')
+                            ->where('id','=',$business_identity_id)
+                            ->first();
+
+        $this->view_data['meta_title'] = $record_info->business_alias.'-'.$record_info->business_identity.'-'.$types[$type];
         $this->view_data['type'] = $type;
         $this->view_data['business_identity_id'] = $business_identity_id;
         return view('finance.show-data', $this->view_data);
