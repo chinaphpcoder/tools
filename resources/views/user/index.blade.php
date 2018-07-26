@@ -11,7 +11,7 @@
     </h1>
     <ol class="breadcrumb">
         <li><a href="{{route('home')}}"><i class="fa fa-dashboard"></i>首页</a></li>
-        <li><a href="{{route('user_list')}}">后台用户</a></li>
+        <li><a href="{{route('user.index')}}">后台用户</a></li>
         <li class="active">{{$meta_title}}</li>
     </ol>
 </section>
