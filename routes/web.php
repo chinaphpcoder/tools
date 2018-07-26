@@ -99,7 +99,7 @@ Route::get('/college/delete', 'CollegeController@delete')->middleware('auth')->n
 Route::get('/college/status', 'CollegeController@status')->middleware('auth')->name('college_status');
 
 //媒体报道
-Route::get('/news/index', 'NewsController@index')->middleware('auth')->name('news_list');
+Route::get('/news/index', 'NewsController@index')->middleware('auth')->name('user.index');
 Route::get('/news/add', 'NewsController@add')->middleware('auth')->name('news_add');
 Route::get('/news/edit', 'NewsController@edit')->middleware('auth')->name('news_edit');
 Route::post('/news/update', 'NewsController@update')->middleware('auth')->name('news_update');
@@ -128,15 +128,6 @@ Route::get('/story/status', 'StoryController@status')->middleware('auth')->name(
 Route::get('/story/message', 'StoryController@message')->middleware('auth')->name('story_message');
 Route::get('/story/delmessage', 'StoryController@deleteMessage')->middleware('auth')->name('story_delMessage');
 
-//转盘活动管理
-Route::get('/zhuanpan/user_list', 'ActivityController@index')->middleware('auth')->name('user_list');
-Route::get('/zhuanpan/create', 'ActivityController@create')->middleware('auth')->name('user_create');
-Route::post("/zhuanpan/store", 'ActivityController@store')->middleware('auth')->name('user_store');
-Route::get('/zhuanpan/download', 'ActivityController@download')->middleware('auth')->name('user_download');
-Route::get('/zhuanpan/delete', 'ActivityController@delete')->middleware('auth')->name('user_delete');
-
-Route::any('/zhuanpan/user_list_all', 'ActivityController@userActivityList')->middleware('auth')->name('user_list_all');
-Route::get('/zhuanpan/export', 'ActivityController@export')->middleware('auth')->name('user_export');
 //PC轮播图
 Route::get('pc/banner/index', 'PCBannerController@index')->middleware('auth')->name('pcbanner_index');
 Route::get('pc/banner/add', 'PCBannerController@create')->middleware('auth')->name('pcbanner_add');
