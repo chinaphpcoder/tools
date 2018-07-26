@@ -98,16 +98,8 @@ Route::post('/college/update', 'CollegeController@update')->middleware('auth')->
 Route::get('/college/delete', 'CollegeController@delete')->middleware('auth')->name('college_delete');
 Route::get('/college/status', 'CollegeController@status')->middleware('auth')->name('college_status');
 
-//媒体报道
-Route::get('/news/index', 'NewsController@index')->middleware('auth')->name('user.index');
-Route::get('/news/add', 'NewsController@add')->middleware('auth')->name('news_add');
-Route::get('/news/edit', 'NewsController@edit')->middleware('auth')->name('news_edit');
-Route::post('/news/update', 'NewsController@update')->middleware('auth')->name('news_update');
-Route::get('/news/delete', 'NewsController@delete')->middleware('auth')->name('news_delete');
-Route::get('/news/status', 'NewsController@status')->middleware('auth')->name('news_status');
-
 //后台用户管理
-Route::get('/user/index', 'UserController@index')->middleware('auth')->name('user_list');
+Route::get('/user/index', 'UserController@index')->middleware('auth')->name('user.index');
 Route::get('/user/add', 'UserController@add')->middleware('auth')->name('user_add');
 Route::get('/user/edit', 'UserController@edit')->middleware('auth')->name('user_edit');
 Route::post('/user/update', 'UserController@update')->middleware('auth')->name('user_update');
