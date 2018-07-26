@@ -59,7 +59,7 @@
             elem: '#test'
             ,url:'{{ route("finance.get-account-record") }}'
             //,width: '100%' //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-            ,cellMinWidth: 50
+            ,cellMinWidth: 20
             ,size:'lg'
             ,cols: [[
                 {field:'pid', title: '序号'}
