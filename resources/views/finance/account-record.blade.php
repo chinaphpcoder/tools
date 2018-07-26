@@ -42,6 +42,9 @@
                     shade: 0.8,
                     area: ['600px','650px'],
                     scrollbar: false,
+                    end: function(layero){
+                        parent.location.reload();
+                    },
                     content: "{{ route('finance.account-record-details') }}?id="+ data.id
                 });
                 layer.full(index);
