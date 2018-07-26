@@ -210,12 +210,16 @@
                 layer.load(2);
             }
             ,done: function(res){
+                layer.closeAll('loading'); //关闭loading
                 console.log(res);
                 layer.msg(res.msg
                         ,{time:500}
                         ,function(){
                             location.reload();
                         });
+            }
+            ,error: function(index, upload){
+                layer.closeAll('loading'); //关闭loading
             }
         });
 
