@@ -102,6 +102,7 @@ class FinanceController extends Controller
 
     public function accountRecordDetails(Request $request)
     {
+
         $id = $request->input('id');
         $info = DB::table('bill_record')
                 ->where('id','=',$id)
@@ -214,6 +215,8 @@ class FinanceController extends Controller
         session(['basic.column_request_no' => $column_request_no]);
         session(['basic.column_amount' => $column_amount]);
         session(['basic.trim_string' => $trim_string]);
+
+        ini_set ('memory_limit', '256M');
         
         $reader = new Xlsx();
         $spreadsheet = $reader->load($tmp_name);
@@ -367,6 +370,8 @@ class FinanceController extends Controller
         session(['actual.column_request_no' => $column_request_no]);
         session(['actual.column_amount' => $column_amount]);
         session(['actual.trim_string' => $trim_string]);
+
+        ini_set ('memory_limit', '256M');
         
         $reader = new Xlsx();
         $spreadsheet = $reader->load($tmp_name);
