@@ -67,6 +67,28 @@ class FinanceController extends Controller
         return $result;
     }
 
+    public function deleteAccountRecord(Request $request)
+    {
+        $id = $request->input('id');
+        if($id <= 0) {
+            return $this->error('删除失败');
+        }
+
+        $result = DB::table('bill_record')
+                ->where('id',$id)
+                ->delete();
+        if($result === false) {
+            return $this->error('删除失败');
+        }
+        $result = DB::table('bill_detail_log')
+                ->where('business_identity_id',$id)
+                ->delete();
+        if($result === false) {
+            return $this->error('删除失败');
+        }
+        return $this->success('删除成功');
+    }
+
     public function addAccountRecord(Request $request)
     {
         $this->view_data['meta_title'] = '业务对账记录';

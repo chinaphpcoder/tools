@@ -197,6 +197,7 @@ Route::post('/weixin/reply_update', 'WeixinController@replyUpdate')->middleware(
 Route::get('/finance/account-record','FinanceController@accountRecord')->middleware('auth')->name('finance.account-record');
 Route::get('/finance/get-account-record','FinanceController@getAccountRecord')->middleware('auth')->name('finance.get-account-record');
 Route::get('/finance/add-account-record','FinanceController@addAccountRecord')->middleware('auth')->name('finance.add-account-record');
+Route::post('/finance/delete-account-record','FinanceController@deleteAccountRecord')->middleware('auth')->name('finance.delete-account-record');
 Route::post('/finance/add-account-record','FinanceController@updateAccountRecord')->middleware('auth')->name('finance.update-account-record');
 Route::get('/finance/account-record-details','FinanceController@accountRecordDetails')->middleware('auth')->name('finance.account-record-details');
 Route::post('/finance/upload-basic-data','FinanceController@uploadBasicData')->middleware('auth')->name('finance.upload-basic-data');

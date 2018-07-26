@@ -48,6 +48,35 @@
                     content: "{{ route('finance.account-record-details') }}?id="+ data.id
                 });
                 layer.full(index);
+            } else if(obj.event === 'del-record'){
+                layer.confirm('确定删除该记录？', {
+                    btn: ['确定','取消'] //按钮
+                }, function(){
+                    var id = obj.data.id;
+                    $.ajax({
+                        url:'{{ route("finance.delete-account-record") }}',
+                        headers: { 'X-CSRF-Token' : $('meta[name=_token]').attr('content') },
+                        type:'post',
+                        data:{id: id},
+                        dataType:'json',
+                        success:function(data){
+
+                            if(data.code == 200){
+                                layer.msg(data.msg, {icon: 1,time:1000},function(){
+                                parent.location.reload();
+                            });
+                                
+                            }else{
+                                layer.alert(data.msg);
+                            }
+                        },
+                        
+                        error:function(data){
+                            layer.alert('系统异常');
+                        },
+                    });
+                }, function(){
+                });
             } else if(obj.event === 'show-all-data'){
                 window.open("{{ route('finance.show-data') }}?id="+ data.id+'&type=0',"_blank");
             } else if(obj.event === 'show-error-data'){
@@ -68,7 +97,7 @@
                 ,{field:'status_text', title: '状态',minWidth: 80}
                 ,{field:'created_at',title: '创建时间'}
                 ,{field:'name',title: '创建人'}
-                ,{field:'op', title: '操作',toolbar: '#barDemo',minWidth: 250}
+                ,{field:'op', title: '操作',toolbar: '#barDemo',minWidth: 260}
             ]]
             ,page: true
         });
@@ -112,9 +141,10 @@
 </script>
 
 <script type="text/html" id="barDemo">
-    <a class="layui-btn layui-btn-sm" lay-event="detail">查看详情</a>
-    <a class="layui-btn layui-btn-sm" lay-event="show-error-data">错误数据</a>
-    <a class="layui-btn layui-btn-sm" lay-event="show-all-data">所有数据</a>
+    <a class="layui-btn layui-btn-sm" lay-event="detail" style="margin-left: 0px">详情</a>
+    <a class="layui-btn layui-btn-sm" lay-event="show-error-data" style="margin-left: 0px">错误数据</a>
+    <a class="layui-btn layui-btn-sm" lay-event="show-all-data" style="margin-left: 0px">所有数据</a>
+    <a class="layui-btn layui-btn-sm" lay-event="del-record" style="margin-left: 0px">删除</a>
 </script>
 
 @endsection
