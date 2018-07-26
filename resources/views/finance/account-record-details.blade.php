@@ -207,7 +207,7 @@
                 uploadActual.config.data.column_request_no = $("[name='upload-actual-request-no']").val();
                 uploadActual.config.data.column_amount = $("[name='upload-actual-amount']").val();
                 uploadActual.config.data.trim_string = $("[name='upload-actual-trim']").val();
-                layer.load();
+                layer.load(2);
             }
             ,done: function(res){
                 console.log(res);
