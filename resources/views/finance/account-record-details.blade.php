@@ -164,7 +164,7 @@
                 uploadBasic.config.data.column_request_no = $("[name='upload-basic-request-no']").val();
                 uploadBasic.config.data.column_amount = $("[name='upload-basic-amount']").val();
                 uploadBasic.config.data.trim_string = $("[name='upload-basic-trim']").val();
-                layer.load(2,{content:'数据上传中，请耐心等待，不要刷新页面'});
+                layer.load(2,{content:'上传中'});
             }
             ,done: function(res){
                 layer.closeAll('loading'); //关闭loading
