@@ -62,10 +62,10 @@
             ,cellMinWidth: 20
             ,size:'lg'
             ,cols: [[
-                {field:'pid', title: '序号'}
+                {field:'pid', title: '序号',width: 30}
                 ,{field:'business_identity', title: '业务标识'}
                 ,{field:'business_alias', title: '业务名称'}
-                ,{field:'status_text', title: '状态'}
+                ,{field:'status_text', title: '状态',width: 30}
                 ,{field:'created_at',title: '创建时间'}
                 ,{field:'name',title: '创建人'}
                 ,{field:'op', title: '操作',toolbar: '#barDemo',width: 250}
