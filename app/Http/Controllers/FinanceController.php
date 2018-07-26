@@ -44,7 +44,7 @@ class FinanceController extends Controller
         $limit_start = ($page - 1) * $limit;
 
         $total_count = DB::table('bill_record')->count();
-        $statuses = [ 0=>'未上传数据',1=>'已上传基准数据',2=>'已上传实际数据',3=>'平账',4=>'不平账',];
+        $statuses = [ 0=>'未上传',1=>'已传基准',2=>'已传实际',3=>'平账',4=>'不平账',];
         $lists = DB::table('bill_record')
             ->join('users', 'bill_record.user_id', '=', 'users.id')
             ->select(['bill_record.id','users.name','bill_record.business_identity','business_alias','bill_record.status','bill_record.created_at'])
@@ -130,7 +130,7 @@ class FinanceController extends Controller
                 ->where('id','=',$id)
                 ->first();
         $info = json_decode(json_encode($info),true);
-        $statuses = [ 0=>'未上传数据',1=>'已上传基准数据',2=>'已上传实际数据',3=>'平账',4=>'不平账',];
+        $statuses = [ 0=>'未上传',1=>'已传基准',2=>'已传实际',3=>'平账',4=>'不平账',];
         $overall_data = [];
         $overall_data[] = ['key' => '业务名称', 'value' => $info['business_alias'] ];
         $overall_data[] = ['key' => '业务标识', 'value' => $info['business_identity'] ];

@@ -87,17 +87,17 @@
         table.render({
             elem: '#test'
             ,url:'{{ route("finance.get-account-record") }}'
-            //,width: '100%' //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            // ,width: '100%' //全局定义常规单元格的最小宽度，layui 2.2.1 新增
             ,cellMinWidth: 20
             ,size:'lg'
             ,cols: [[
                 {field:'pid', title: '序号',width: 60}
                 ,{field:'business_identity', title: '业务标识'}
                 ,{field:'business_alias', title: '业务名称'}
-                ,{field:'status_text', title: '状态',minWidth: 80}
+                ,{field:'status_text', title: '状态',width: 80}
                 ,{field:'created_at',title: '创建时间'}
-                ,{field:'name',title: '创建人'}
-                ,{field:'op', title: '操作',toolbar: '#barDemo',minWidth: 270}
+                ,{field:'name',title: '创建人',width: 80}
+                ,{field:'op', title: '操作',toolbar: '#barDemo',width: 270}
             ]]
             ,page: true
         });
