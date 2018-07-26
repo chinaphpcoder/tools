@@ -150,6 +150,22 @@ class FinanceController extends Controller
         $this->view_data['basic_data'] = $basic_data;
         $this->view_data['actual_data'] = $actual_data;
 
+        //session
+        $basic = [];
+        $basic['header'] = session('basic.header','1');
+        $basic['column_request_no'] = session('basic.column_request_no','A');
+        $basic['column_amount'] = session('basic.column_amount','B');
+        $basic['trim_string'] = session('basic.trim_string','');
+
+        $actual = [];
+        $actual['header'] = session('actual.header','1');
+        $actual['column_request_no'] = session('actual.column_request_no','A');
+        $actual['column_amount'] = session('actual.column_amount','B');
+        $actual['trim_string'] = session('actual.trim_string','');
+
+        $this->view_data['basic_config'] = $basic;
+        $this->view_data['actual_config'] = $actual;
+
         return view('finance.account-record-details', $this->view_data);
     }
 
@@ -193,6 +209,11 @@ class FinanceController extends Controller
         }
         $trim_string = $request->input('trim_string','');
         $trim_string = trim($trim_string);
+
+        session(['basic.header' => $header]);
+        session(['basic.column_request_no' => $column_request_no]);
+        session(['basic.column_amount' => $column_amount]);
+        session(['basic.trim_string' => $trim_string]);
         
         $reader = new Xlsx();
         $spreadsheet = $reader->load($tmp_name);
@@ -341,6 +362,11 @@ class FinanceController extends Controller
         }
         $trim_string = $request->input('trim_string','');
         $trim_string = trim($trim_string);
+
+        session(['actual.header' => $header]);
+        session(['actual.column_request_no' => $column_request_no]);
+        session(['actual.column_amount' => $column_amount]);
+        session(['actual.trim_string' => $trim_string]);
         
         $reader = new Xlsx();
         $spreadsheet = $reader->load($tmp_name);

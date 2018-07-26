@@ -46,19 +46,19 @@
                             <div class="layui-inline">
                                 <label class="layui-form-label" style="width: 60px">包含表头</label>
                                 <div class="layui-input-inline" style="width: 30px">
-                                    <input type="checkbox" checked="" name="upload-basic-header" lay-skin="switch" lay-filter="switchTest" lay-text="是|否">
+                                    <input type="checkbox" @if ($basic_config['header'] == 1) checked="" @endif name="upload-basic-header" lay-skin="switch" lay-filter="switchTest" lay-text="是|否">
                                 </div>
                                 <label class="layui-form-label" style="width: 60px">流水号列</label>
                                 <div class="layui-input-inline" style="width: 40px;">
-                                    <input type="text" name="upload-basic-request-no" placeholder="" autocomplete="off" class="layui-input" value="A">
+                                    <input type="text" name="upload-basic-request-no" placeholder="" autocomplete="off" class="layui-input" value="{{ $basic_config['column_request_no']}}">
                                 </div>
                                 <label class="layui-form-label" style="width: 50px">金额列</label>
                                 <div class="layui-input-inline" style="width: 40px;">
-                                    <input type="text" name="upload-basic-amount" placeholder="" autocomplete="off" class="layui-input"  value="B">
+                                    <input type="text" name="upload-basic-amount" placeholder="" autocomplete="off" class="layui-input"  value="{{ $basic_config['column_amount']}}">
                                 </div>
                                 <label class="layui-form-label" style="width: 70px">过滤字符串</label>
                                 <div class="layui-input-inline" style="width: 50px;">
-                                    <input type="text" name="upload-basic-trim" placeholder="" autocomplete="off" class="layui-input">
+                                    <input type="text" name="upload-basic-trim" placeholder="" autocomplete="off" class="layui-input" value="{{ $basic_config['trim_string']}}">
                                 </div>
                             </div>
                         </div>
@@ -102,19 +102,19 @@
                             <div class="layui-inline">
                                 <label class="layui-form-label" style="width: 60px">包含表头</label>
                                 <div class="layui-input-inline" style="width: 30px">
-                                    <input type="checkbox" checked="" name="upload-actual-header" lay-skin="switch" lay-filter="switchTest" lay-text="是|否">
+                                    <input type="checkbox" @if ($actual_config['header'] == 1) checked="" @endif name="upload-actual-header" lay-skin="switch" lay-filter="switchTest" lay-text="是|否">
                                 </div>
                                 <label class="layui-form-label" style="width: 60px">流水号列</label>
                                 <div class="layui-input-inline" style="width: 40px;">
-                                    <input type="text" name="upload-actual-request-no" placeholder="" autocomplete="off" class="layui-input" value="A">
+                                    <input type="text" name="upload-actual-request-no" placeholder="" autocomplete="off" class="layui-input" value="{{ $actual_config['column_request_no']}}">
                                 </div>
                                 <label class="layui-form-label" style="width: 50px">金额列</label>
                                 <div class="layui-input-inline" style="width: 40px;">
-                                    <input type="text" name="upload-actual-amount" placeholder="" autocomplete="off" class="layui-input"  value="B">
+                                    <input type="text" name="upload-actual-amount" placeholder="" autocomplete="off" class="layui-input"  value="{{ $actual_config['column_amount']}}">
                                 </div>
                                 <label class="layui-form-label" style="width: 70px">过滤字符串</label>
                                 <div class="layui-input-inline" style="width: 50px;">
-                                    <input type="text" name="upload-actual-trim" placeholder="" autocomplete="off" class="layui-input">
+                                    <input type="text" name="upload-actual-trim" placeholder="" autocomplete="off" class="layui-input" value="{{ $actual_config['trim_string']}}">
                                 </div>
                             </div>
                         </div>
