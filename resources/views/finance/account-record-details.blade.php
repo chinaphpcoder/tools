@@ -146,6 +146,7 @@
 <script>
     layui.use(['form','upload'], function(){
         var form = layui.form
+            ,layer = layui.layer
             ,upload = layui.upload;
 
         form.verify({
@@ -179,6 +180,7 @@
                 uploadBasic.config.data.column_request_no = $("[name='upload-basic-request-no']").val();
                 uploadBasic.config.data.column_amount = $("[name='upload-basic-amount']").val();
                 uploadBasic.config.data.trim_string = $("[name='upload-basic-trim']").val();
+                layer.load(2);
             }
             ,done: function(res){
                 console.log(res);
@@ -205,6 +207,7 @@
                 uploadActual.config.data.column_request_no = $("[name='upload-actual-request-no']").val();
                 uploadActual.config.data.column_amount = $("[name='upload-actual-amount']").val();
                 uploadActual.config.data.trim_string = $("[name='upload-actual-trim']").val();
+                layer.load();
             }
             ,done: function(res){
                 console.log(res);
