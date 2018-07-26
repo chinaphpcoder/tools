@@ -7,7 +7,7 @@
     </h1>
     <ol class="breadcrumb">
         <li><a href="{{route('home')}}"><i class="fa fa-dashboard"></i>首页</a></li>
-        <li><a href="{{route('user_list')}}">后台用户</a></li>
+        <li><a href="{{route('user.index')}}">后台用户</a></li>
         <li class="active">{{$meta_title}}</li>
     </ol>
 </section>
@@ -16,7 +16,7 @@
         <div class="col-md-12">
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <a href="{{route('user_list')}}" class="btn btn-primary active" role="button">返回列表</a>
+                    <a href="{{route('user.index')}}" class="btn btn-primary active" role="button">返回列表</a>
                 </div>
                 <form class="form-horizontal" method="POST" action="{{route('user_update')}}" role="form">
                     {{ csrf_field() }}
