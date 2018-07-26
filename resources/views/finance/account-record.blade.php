@@ -97,7 +97,7 @@
                 ,{field:'status_text', title: '状态',minWidth: 80}
                 ,{field:'created_at',title: '创建时间'}
                 ,{field:'name',title: '创建人'}
-                ,{field:'op', title: '操作',toolbar: '#barDemo',minWidth: 260}
+                ,{field:'op', title: '操作',toolbar: '#barDemo',minWidth: 270}
             ]]
             ,page: true
         });
