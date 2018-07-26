@@ -149,22 +149,6 @@
             ,layer = layui.layer
             ,upload = layui.upload;
 
-        form.verify({
-            obtain_probability: function(value){
-                if( $.trim(value).length < 1){
-                    return '中奖概率不能为空';
-                }
-                var ex =  /^[0-9]+.?[0-9]*$/;
-                if ( !ex.test(value) ) {
-                   return '中奖概率必须为数字';
-                }
-                var num = parseFloat(value);
-                if( num < 0 || num > 100 ){
-                    return '中奖概率范围为0-100';
-                }
-            }
-        });
-
         //选完文件后不自动上传
         var uploadBasic = upload.render({
             elem: '#upload-basic-select'
@@ -183,12 +167,17 @@
                 layer.load(2);
             }
             ,done: function(res){
+                layer.closeAll('loading'); //关闭loading
                 console.log(res);
                 layer.msg(res.msg
                         ,{time:500}
                         ,function(){
                             location.reload();
                         });
+            }
+            ,error: function(index, upload){
+                layer.closeAll('loading'); //关闭loading
+                layer.alert("上传失败");
             }
         });
 
@@ -220,35 +209,8 @@
             }
             ,error: function(index, upload){
                 layer.closeAll('loading'); //关闭loading
+                layer.alert("上传失败");
             }
-        });
-
-        //监听提交
-        form.on('submit(formDemo)', function(data){
-            $.ajax({
-                url:'{{ route("activity.prize.probability.update") }}',
-                headers: { 'X-CSRF-Token' : $('meta[name=_token]').attr('content') },
-                type:'put',
-                data:$("#form-setting").serialize(),
-                dataType:'json',
-                success:function(data){
-
-                    if(data.code == 200){
-                        layer.msg(data.msg, {icon: 1,time:1000},function(){
-                        parent.location.reload();
-                    });
-                        
-                    }else{
-                        layer.alert(data.msg);
-                    }
-                },
-                
-                error:function(data){
-                    layer.alert('系统异常');
-                },
-            });
-            //layer.msg(JSON.stringify(data.field));
-            //return false;
         });
     });
 </script>
