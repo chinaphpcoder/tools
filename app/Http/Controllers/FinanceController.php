@@ -317,8 +317,8 @@ class FinanceController extends Controller
 
                     foreach ($update_data_array as $key => $value) {
                         $ids .= "{$key},";
-                        $when1 .= sprintf("WHEN %d THEN %d ", $key, $value['amount']);
-                        $when2 .= sprintf("WHEN %d THEN %d ", $key, $value['status']);
+                        $when1 .= sprintf("WHEN %d THEN %f ", $key, $value['amount']);
+                        $when2 .= sprintf("WHEN %d THEN %f ", $key, $value['status']);
                     }
 
                     $ids = trim($ids,',');
@@ -357,8 +357,8 @@ class FinanceController extends Controller
 
             foreach ($update_data_array as $key => $value) {
                 $ids .= "{$key},";
-                $when1 .= sprintf("WHEN %d THEN %d ", $key, $value['amount']);
-                $when2 .= sprintf("WHEN %d THEN %d ", $key, $value['status']);
+                $when1 .= sprintf("WHEN %d THEN %f ", $key, $value['amount']);
+                $when2 .= sprintf("WHEN %d THEN %f ", $key, $value['status']);
             }
 
             $ids = trim($ids,',');
@@ -537,8 +537,8 @@ class FinanceController extends Controller
 
                     foreach ($update_data_array as $key => $value) {
                         $ids .= "{$key},";
-                        $when1 .= sprintf("WHEN %d THEN %d ", $key, $value['amount']);
-                        $when2 .= sprintf("WHEN %d THEN %d ", $key, $value['status']);
+                        $when1 .= sprintf("WHEN %d THEN %f ", $key, $value['amount']);
+                        $when2 .= sprintf("WHEN %d THEN %f ", $key, $value['status']);
                     }
 
                     $ids = trim($ids,',');
@@ -577,8 +577,8 @@ class FinanceController extends Controller
 
             foreach ($update_data_array as $key => $value) {
                 $ids .= "{$key},";
-                $when1 .= sprintf("WHEN %d THEN %d ", $key, $value['amount']);
-                $when2 .= sprintf("WHEN %d THEN %d ", $key, $value['status']);
+                $when1 .= sprintf("WHEN %d THEN %f ", $key, $value['amount']);
+                $when2 .= sprintf("WHEN %d THEN %f ", $key, $value['status']);
             }
 
             $ids = trim($ids,',');
