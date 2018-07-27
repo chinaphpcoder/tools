@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DB;
+use Log;
 use PHPExcel;
 use PHPExcel_IOFactory;
 use PHPExcel_Style_Alignment;
@@ -249,9 +250,12 @@ class FinanceController extends Controller
         $total_column = $sheet->getHighestColumn(); // 取得总列数
         $result = ['row' => $total_row , 'column' => $total_column];
 
-        DB::beginTransaction();
+        //DB::beginTransaction();
 
         $count = 0;
+        $insert_data_array = [];
+        $update_data_array = [];
+        $default_status = 2;
 
         for ($row = $start_row; $row <= $total_row; $row++) //行号从1开始
         {
@@ -262,29 +266,21 @@ class FinanceController extends Controller
             } else {
                 $request_no = trim($request_no,$trim_string." \r\n");
             }
-	    if($request_no == null){
-	        continue;
+            if($request_no == null){
+	           continue;
             }
             if($amount == 0){
                 $amount = 0;
+            } else{
+                $amount = floatval($amount);
             }
             $bill_info = DB::table('bill_detail_log')
                     ->where('request_no','=',$request_no)
                     ->where('business_identity_id','=',$business_identity_id)
                     ->first();
+
             if($bill_info == null ) {
-                $insert_data = [
-                    'business_identity_id' => $business_identity_id,
-                    'request_no' => $request_no,
-                    'base_amount' => $amount,
-                    'status' => 2,
-                ];
-                $id = DB::table('bill_detail_log')
-                    ->insert($insert_data);
-                if ( $id <= 0 ) {
-                    DB::rollBack();
-                    return $this->error('添加失败');
-                }
+                $insert_data_array["{$request_no}---{$business_identity_id}"] = [ 'business_identity_id' => $business_identity_id,'request_no' => $request_no,'amount' =>$amount,'status'=>$default_status];
             } else {
                 if( $bill_info->account_amount == 0 ) {
                     $status = 2;
@@ -293,29 +289,88 @@ class FinanceController extends Controller
                 } else {
                     $status = 4;
                 }
-                $result = DB::table('bill_detail_log')
-                            ->where('id','=',$bill_info->id)
-                            ->update(
-                                [
-                                    'base_amount' => $amount,
-                                    'status' => $status,
-                                ]
-                            );
-                if($result === false) {
-                    DB::rollBack();
-                    return $this->error('更新失败');
-                }
+                $update_data_array[$bill_info->id] = ['amount' => $amount,'status' => $status];
 
             }
             $count++;
             if( $count % 5000 == 0 ) {
-                DB::commit();
-                DB::beginTransaction();
+                // DB::commit();
+                // DB::beginTransaction();
+                if($insert_data_array != null) {
+                    $insert_data = '';
+                    foreach ( $insert_data_array as $key => $value) {
+                        $insert_data .= "('{$value['business_identity_id']}','{$value['request_no']}','{$value['amount']}','{$value['status']}'),";
+                    }
+                    $insert_data = trim($insert_data,',');
+                    $sql = "insert into tools_bill_detail_log (`business_identity_id`,`request_no`,`base_amount`,`status`) values {$insert_data}";
+                    //Log::error($sql);
+                    $status = DB::statement($sql);
+                    if( $status !== true ) {
+                        return $this->error('上传失败1');
+                    }
+                }
+
+                if($update_data_array != null) {
+                    $when1 = '';
+                    $when2 = '';
+                    $ids = '';
+
+                    foreach ($update_data_array as $key => $value) {
+                        $ids .= "{$key},";
+                        $when1 .= sprintf("WHEN %d THEN %d ", $key, $value['amount']);
+                        $when2 .= sprintf("WHEN %d THEN %d ", $key, $value['status']);
+                    }
+
+                    $ids = trim($ids,',');
+
+                    $sql = "UPDATE tools_bill_detail_log SET base_amount = CASE id {$when1} END , status = CASE id {$when2} END WHERE id IN ($ids)";
+                    //Log::error($sql);
+                    $status = DB::statement($sql);
+                    if( $status !== true ) {
+                        return $this->error('上传失败2');
+                    }
+                }
+                $insert_data_array = [];
+                $update_data_array = [];
             }
 
         }
+        //处理数据
+        if($insert_data_array != null) {
+            $insert_data = '';
+            foreach ( $insert_data_array as $key => $value) {
+                $insert_data .= "('{$value['business_identity_id']}','{$value['request_no']}','{$value['amount']}','{$value['status']}'),";
+            }
+            $insert_data = trim($insert_data,',');
+            $sql = "insert into tools_bill_detail_log (`business_identity_id`,`request_no`,`base_amount`,`status`) values {$insert_data}";
+            //Log::error($sql);
+            $status = DB::statement($sql);
+            if( $status !== true ) {
+                return $this->error('上传失败1');
+            }
+        }
 
-        DB::commit();
+        if($update_data_array != null) {
+            $when1 = '';
+            $when2 = '';
+            $ids = '';
+
+            foreach ($update_data_array as $key => $value) {
+                $ids .= "{$key},";
+                $when1 .= sprintf("WHEN %d THEN %d ", $key, $value['amount']);
+                $when2 .= sprintf("WHEN %d THEN %d ", $key, $value['status']);
+            }
+
+            $ids = trim($ids,',');
+
+            $sql = "UPDATE tools_bill_detail_log SET base_amount = CASE id {$when1} END,SET status = CASE id {$when2} END WHERE id IN ($ids)";
+            $status = DB::statement($sql);
+            if( $status !== true ) {
+                return $this->error('上传失败2');
+            }
+        }
+
+        //DB::commit();
 
         //更新对账状态
         $record_info = DB::table('bill_record')
@@ -413,9 +468,12 @@ class FinanceController extends Controller
         $total_column = $sheet->getHighestColumn(); // 取得总列数
         $result = ['row' => $total_row , 'column' => $total_column];
 
-        DB::beginTransaction();
+        //DB::beginTransaction();
 
         $count = 0;
+        $insert_data_array = [];
+        $update_data_array = [];
+        $default_status = 3;
 
         for ($row = $start_row; $row <= $total_row; $row++) //行号从1开始
         {
@@ -431,6 +489,9 @@ class FinanceController extends Controller
             }
             if($amount == 0){
                 $amount = 0;
+            } else {
+                $amount = floatval($amount);
+
             }
         
             $bill_info = DB::table('bill_detail_log')
@@ -438,18 +499,7 @@ class FinanceController extends Controller
                     ->where('business_identity_id','=',$business_identity_id)
                     ->first();
             if($bill_info == null ) {
-                $insert_data = [
-                    'business_identity_id' => $business_identity_id,
-                    'request_no' => $request_no,        
-                    'account_amount' => $amount,
-                    'status' => 3,
-                ];
-                $id = DB::table('bill_detail_log')
-                    ->insert($insert_data);
-                if ( $id <= 0 ) {
-                    DB::rollBack();
-                    return $this->error('添加失败');
-                }
+                $insert_data_array["{$request_no}---{$business_identity_id}"] = [ 'business_identity_id' => $business_identity_id,'request_no' => $request_no,'amount' =>$amount,'status'=>$default_status];
             } else {
                 if( $bill_info->base_amount == 0 ) {
                     $status = 3;
@@ -458,27 +508,88 @@ class FinanceController extends Controller
                 } else {
                     $status = 4;
                 }
-                $result = DB::table('bill_detail_log')
-                            ->where('id','=',$bill_info->id)
-                            ->update(
-                                [
-                                    'account_amount' => $amount,
-                                    'status' => $status,
-                                ]
-                            );
-                if($result === false) {
-                    DB::rollBack();
-                    return $this->error('更新失败');
-                }
+                $update_data_array[$bill_info->id] = ['amount' => $amount,'status' => $status];
 
             }
+
             $count++;
             if( $count % 5000 == 0 ) {
-                DB::commit();
-                DB::beginTransaction();
+                //DB::commit();
+                //DB::beginTransaction();
+                if($insert_data_array != null) {
+                    $insert_data = '';
+                    foreach ( $insert_data_array as $key => $value) {
+                        $insert_data .= "('{$value['business_identity_id']}','{$value['request_no']}','{$value['amount']}','{$value['status']}'),";
+                    }
+                    $insert_data = trim($insert_data,',');
+                    $sql = "insert into tools_bill_detail_log (`business_identity_id`,`request_no`,`account_amount`,`status`) values {$insert_data}";
+                    //Log::error($sql);
+                    $status = DB::statement($sql);
+                    if( $status !== true ) {
+                        return $this->error('上传失败1');
+                    }
+                }
+
+                if($update_data_array != null) {
+                    $when1 = '';
+                    $when2 = '';
+                    $ids = '';
+
+                    foreach ($update_data_array as $key => $value) {
+                        $ids .= "{$key},";
+                        $when1 .= sprintf("WHEN %d THEN %d ", $key, $value['amount']);
+                        $when2 .= sprintf("WHEN %d THEN %d ", $key, $value['status']);
+                    }
+
+                    $ids = trim($ids,',');
+
+                    $sql = "UPDATE tools_bill_detail_log SET account_amount = CASE id {$when1} END , status = CASE id {$when2} END WHERE id IN ($ids)";
+                    //Log::error($sql);
+                    $status = DB::statement($sql);
+                    if( $status !== true ) {
+                        return $this->error('上传失败2');
+                    }
+                }
+                $insert_data_array = [];
+                $update_data_array = [];
+
             }
         }
-        DB::commit();
+        //DB::commit();
+        if($insert_data_array != null) {
+            $insert_data = '';
+            foreach ( $insert_data_array as $key => $value) {
+                $insert_data .= "('{$value['business_identity_id']}','{$value['request_no']}','{$value['amount']}','{$value['status']}'),";
+            }
+            $insert_data = trim($insert_data,',');
+            $sql = "insert into tools_bill_detail_log (`business_identity_id`,`request_no`,`account_amount`,`status`) values {$insert_data}";
+            //Log::error($sql);
+            $status = DB::statement($sql);
+            if( $status !== true ) {
+                return $this->error('上传失败1');
+            }
+        }
+
+        if($update_data_array != null) {
+            $when1 = '';
+            $when2 = '';
+            $ids = '';
+
+            foreach ($update_data_array as $key => $value) {
+                $ids .= "{$key},";
+                $when1 .= sprintf("WHEN %d THEN %d ", $key, $value['amount']);
+                $when2 .= sprintf("WHEN %d THEN %d ", $key, $value['status']);
+            }
+
+            $ids = trim($ids,',');
+
+            $sql = "UPDATE tools_bill_detail_log SET account_amount = CASE id {$when1} END , status = CASE id {$when2} END WHERE id IN ($ids)";
+            //Log::error($sql);
+            $status = DB::statement($sql);
+            if( $status !== true ) {
+                return $this->error('上传失败2');
+            }
+        }
         //更新对账状态
         $record_info = DB::table('bill_record')
                         ->where('id','=',$business_identity_id)
