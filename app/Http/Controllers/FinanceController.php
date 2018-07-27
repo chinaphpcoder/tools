@@ -363,7 +363,7 @@ class FinanceController extends Controller
 
             $ids = trim($ids,',');
 
-            $sql = "UPDATE tools_bill_detail_log SET base_amount = CASE id {$when1} END,SET status = CASE id {$when2} END WHERE id IN ($ids)";
+            $sql = "UPDATE tools_bill_detail_log SET base_amount = CASE id {$when1} END , status = CASE id {$when2} END WHERE id IN ($ids)";
             $status = DB::statement($sql);
             if( $status !== true ) {
                 return $this->error('上传失败2');
