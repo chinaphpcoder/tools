@@ -665,6 +665,16 @@ class FinanceController extends Controller
         if($type == 0) {
             $type = 0;
         }
+        $info = DB::table('bill_record')
+                ->where('id','=',$business_identity_id)
+                ->first();
+        //判断权限
+        $admin = $this->check_user();
+        if( $admin !== true ) {
+            if( $info->user_id != $admin ) {
+                return parent::error('无权限操作他人数据');
+            }
+        }
 
         $types = [ 0=>'全部记录' , 1 => '错误记录'];
 
@@ -698,26 +708,45 @@ class FinanceController extends Controller
 
         $limit_start = ($page - 1) * $limit;
 
-        $total_count = DB::table('bill_detail_log')
+        $info = DB::table('bill_record')
+                ->where('id','=',$business_identity_id)
+                ->first();
+        $admin_auth = true;
+        //判断权限
+        $admin = $this->check_user();
+        if( $admin !== true ) {
+            if( $info->user_id != $admin ) {
+                $admin_auth = false;
+            }
+        }
+
+        if($admin_auth) {
+            $total_count = DB::table('bill_detail_log')
                             ->where('business_identity_id','=',$business_identity_id)
                             ->whereIn('status',$status)
                             ->count();
-        $statuses = [ 1=>'平账',2=>'长款',3=>'短款',4=>'存疑'];
-        $lists = DB::table('bill_detail_log')
-                    ->where('business_identity_id','=',$business_identity_id)
-                    ->whereIn('status',$status)
-                    ->select(['request_no','base_amount','account_amount','status'])
-                    ->orderBy('id', 'asc')
-                    ->offset($limit_start)
-                    ->limit($limit)
-                    ->get();
-        $lists = json_decode(json_encode($lists),true);
-        $count = $limit_start + 1;
-        foreach ($lists as $key=>$value) {
-            $lists[$key]['pid'] = $count;
-            $lists[$key]['status_text'] = $statuses[$value['status']];
-            $count++;
+            $statuses = [ 1=>'平账',2=>'长款',3=>'短款',4=>'存疑'];
+            $lists = DB::table('bill_detail_log')
+                        ->where('business_identity_id','=',$business_identity_id)
+                        ->whereIn('status',$status)
+                        ->select(['request_no','base_amount','account_amount','status'])
+                        ->orderBy('id', 'asc')
+                        ->offset($limit_start)
+                        ->limit($limit)
+                        ->get();
+            $lists = json_decode(json_encode($lists),true);
+            $count = $limit_start + 1;
+            foreach ($lists as $key=>$value) {
+                $lists[$key]['pid'] = $count;
+                $lists[$key]['status_text'] = $statuses[$value['status']];
+                $count++;
+            }
+        } else {
+            $total_count = 0;
+            $lists = [];
         }
+
+        
         $result = [];
         $result['code'] = 0;
         $result['msg'] = '';
@@ -743,6 +772,13 @@ class FinanceController extends Controller
             $record_info = DB::table('bill_record')
                                 ->where('id','=',$business_identity_id)
                                 ->first();
+            //判断权限
+            $admin = $this->check_user();
+            if( $admin !== true ) {
+                if( $record_info->user_id != $admin ) {
+                    return parent::error('无权限操作他人数据');
+                }
+            }
             $file_name = $record_info->business_alias.'-'.$record_info->business_identity.".xlsx";
             $statuses = [ 1=>'平账',2=>'长款',3=>'短款',4=>'存疑'];
             $lists = DB::table('bill_detail_log')
