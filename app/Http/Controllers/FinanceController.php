@@ -44,10 +44,20 @@ class FinanceController extends Controller
 
         $limit_start = ($page - 1) * $limit;
 
+        $admin = $this->check_user();
+        if($admin === true) {
+            $user_start = 1;
+            $user_end = 1000000;
+        } else {
+            $user_start = $admin;
+            $user_end = $admin;
+        }
+
         $total_count = DB::table('bill_record')->count();
         $statuses = [ 0=>'未上传',1=>'已传基准',2=>'已传实际',3=>'平账',4=>'不平账',];
         $lists = DB::table('bill_record')
             ->join('users', 'bill_record.user_id', '=', 'users.id')
+            ->whereBetween('bill_record.user_id', [$user_start, $user_end])
             ->select(['bill_record.id','users.name','bill_record.business_identity','business_alias','bill_record.status','bill_record.created_at'])
             ->orderBy('bill_record.id', 'desc')
             ->offset($limit_start)
@@ -73,6 +83,21 @@ class FinanceController extends Controller
         $id = $request->input('id');
         if($id <= 0) {
             return $this->error('删除失败');
+        }
+        
+        $info = DB::table('bill_record')
+                ->where('id',$id)
+                ->first();
+        if($info == false) {
+            return $this->error('记录不存在');
+        }
+
+        //判断权限
+        $admin = $this->check_user();
+        if( $admin !== true ) {
+            if( $info->user_id != $admin ) {
+                return $this->error('无权操作他人数据');
+            }
         }
 
         $result = DB::table('bill_record')
@@ -130,6 +155,14 @@ class FinanceController extends Controller
         $info = DB::table('bill_record')
                 ->where('id','=',$id)
                 ->first();
+        //判断权限
+        $admin = $this->check_user();
+        if( $admin !== true ) {
+            if( $info->user_id != $admin ) {
+                return parent::error('无权操作他人数据');
+            }
+        }
+                
         $info = json_decode(json_encode($info),true);
         $statuses = [ 0=>'未上传',1=>'已传基准',2=>'已传实际',3=>'平账',4=>'不平账',];
         $overall_data = [];
@@ -796,7 +829,7 @@ class FinanceController extends Controller
         $user_id = Auth::id();
 
         if ($user_id != 1) {
-            return false;
+            return $user_id;
         } else {
             return true;
         }
