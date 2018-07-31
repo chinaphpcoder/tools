@@ -76,17 +76,17 @@
                     </div>
                 </div>
                 <ul class="sidebar-menu">
-                    @foreach($admin_menu as $key => $row)
+                    @foreach($admin_menu as $row)
                     <li class="treeview">
                         <a href="#">
-                            <i class="fa fa-dashboard"></i> <span>{{$key}}</span>
+                            <i class="fa fa-dashboard"></i> <span>{{$row['title']}}</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
                         </a>
                         <ul class="treeview-menu">
-                            @foreach($row as $info)
-                            <li><a href="{{url($info->url)}}" title="{{$info->tip}}"><i class="fa fa-circle-o"></i>{{$info->title}}</a></li>
+                            @foreach($row['son'] as $info)
+                            <li><a href="{{url($info['url'])}}" title=""><i class="fa fa-circle-o"></i>{{$info['title']}}</a></li>
                             @endforeach
                         </ul>
                     </li>

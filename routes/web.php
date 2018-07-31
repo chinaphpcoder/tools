@@ -206,3 +206,5 @@ Route::post('/finance/upload-actual-data','FinanceController@uploadActualData')-
 Route::get('/finance/show-data','FinanceController@showData')->middleware('auth')->name('finance.show-data');
 Route::get('/finance/get-data','FinanceController@getData')->middleware('auth')->name('finance.get-data');
 Route::get('/finance/export-data','FinanceController@exportData')->middleware('auth')->name('finance.export-data');
+
+Route::get('/test/tree','TestController@tree')->middleware('auth')->name('test.tree');

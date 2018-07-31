@@ -13,17 +13,16 @@ class Controller extends BaseController{
 
     public function __construct() {
         //获取菜单列表
-        $list = Menu::where('status', 1)->orderBy('sort', 'desc')->orderBy('id', 'asc')->select(['title', 'url', 'group', 'tip'])->get();
-
-        //菜单列表分组
-        $tmp = [];
-        foreach ($list as $key => $value) {
-            $tmp[$value->group][] = $value;
+        $list = Menu::orderBy('sort', 'desc')->orderBy('id', 'asc')->select(['id','pid','title', 'url'])->get();
+        $items = json_decode(json_encode($list),true);
+        $items = array_column($items, null,'id');
+        $tree = [];
+        foreach ($items as $item) {
+            $items[$item['pid']]['son'][$item['id']] = &$items[$item['id']];
         }
-        //去除无效的分组
-        $tmp = array_filter($tmp);
+        $menus = isset($items[0]['son']) ? $items[0]['son'] : [];
 
-        $this->view_data['admin_menu'] = $tmp;
+        $this->view_data['admin_menu'] = $menus;
     }
 
     /**
