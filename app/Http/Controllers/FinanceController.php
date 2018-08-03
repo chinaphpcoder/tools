@@ -273,7 +273,7 @@ class FinanceController extends Controller
         session(['basic.trim_string' => $trim_string]);
 
         set_time_limit(0);
-        ini_set ('memory_limit', '512M');
+        ini_set ('memory_limit', '1024M');
         
         $reader = new Xlsx();
         $spreadsheet = $reader->load($tmp_name);
@@ -483,7 +483,7 @@ class FinanceController extends Controller
         session(['actual.trim_string' => $trim_string]);
 
         set_time_limit(0);
-        ini_set ('memory_limit', '512M');
+        ini_set ('memory_limit', '1024M');
         
         $reader = new Xlsx();
         $spreadsheet = $reader->load($tmp_name);
