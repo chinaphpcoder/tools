@@ -173,7 +173,7 @@ class FinanceController extends Controller
         $business_identity_id = $info['id'];
         $base_info = DB::table('bill_detail_log')
                 ->where('business_identity_id','=',$business_identity_id)
-                ->where('base_amount','>',0)
+                ->where('base_amount','!=',0)
                 ->select(
                     DB::raw('count(*) as count'),
                     DB::raw('sum(base_amount) as total_amount')
@@ -188,7 +188,7 @@ class FinanceController extends Controller
 
         $actual_info = DB::table('bill_detail_log')
                 ->where('business_identity_id','=',$business_identity_id)
-                ->where('account_amount','>',0)
+                ->where('account_amount','!=',0)
                 ->select(
                     DB::raw('count(*) as count'),
                     DB::raw('sum(account_amount) as total_amount')
