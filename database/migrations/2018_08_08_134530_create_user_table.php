@@ -21,8 +21,8 @@ class CreateUserTable extends Migration
             $table->string('remember_token',255)->nullable()->comment('登录token');
             $table->timestamps('created_at')->useCurrent()->comment('创建时间');
             $table->timestamp('update_at')->comment('更新时间');
-            $table->->charset('utf8mb4');
-            $table->->collation('utf8mb4_unicode_ci');
+            // $table->charset('utf8mb4');
+            // $table->collation('utf8mb4_unicode_ci');
         });
     }
 // CREATE TABLE `tools_users` (
