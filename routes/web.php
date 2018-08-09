@@ -208,3 +208,4 @@ Route::get('/finance/get-data','FinanceController@getData')->middleware('auth')-
 Route::get('/finance/export-data','FinanceController@exportData')->middleware('auth')->name('finance.export-data');
 
 Route::get('/test/tree','TestController@tree')->middleware('auth')->name('test.tree');
+Route::get('/test/readxls','TestController@readxls')->middleware('auth')->name('test.readxls');
