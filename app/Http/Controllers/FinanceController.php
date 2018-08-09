@@ -284,6 +284,8 @@ class FinanceController extends Controller
         $result = ['row' => $total_row , 'column' => $total_column];
 
         //DB::beginTransaction();
+        $default_db = config("database.default");
+        $table_prefix = config("database.connections.{$default_db}.prefix");
 
         $count = 0;
         $insert_data_array = [];
@@ -335,7 +337,7 @@ class FinanceController extends Controller
                         $insert_data .= "('{$value['business_identity_id']}','{$value['request_no']}','{$value['amount']}','{$value['status']}'),";
                     }
                     $insert_data = trim($insert_data,',');
-                    $sql = "insert into tools_bill_detail_log (`business_identity_id`,`request_no`,`base_amount`,`status`) values {$insert_data}";
+                    $sql = "insert into {$table_prefix}bill_detail_log (`business_identity_id`,`request_no`,`base_amount`,`status`) values {$insert_data}";
                     //Log::error($sql);
                     $status = DB::statement($sql);
                     if( $status !== true ) {
@@ -356,7 +358,7 @@ class FinanceController extends Controller
 
                     $ids = trim($ids,',');
 
-                    $sql = "UPDATE tools_bill_detail_log SET base_amount = CASE id {$when1} END , status = CASE id {$when2} END WHERE id IN ($ids)";
+                    $sql = "UPDATE {$table_prefix}bill_detail_log SET base_amount = CASE id {$when1} END , status = CASE id {$when2} END WHERE id IN ($ids)";
                     //Log::error($sql);
                     $status = DB::statement($sql);
                     if( $status !== true ) {
@@ -375,7 +377,7 @@ class FinanceController extends Controller
                 $insert_data .= "('{$value['business_identity_id']}','{$value['request_no']}','{$value['amount']}','{$value['status']}'),";
             }
             $insert_data = trim($insert_data,',');
-            $sql = "insert into tools_bill_detail_log (`business_identity_id`,`request_no`,`base_amount`,`status`) values {$insert_data}";
+            $sql = "insert into {$table_prefix}bill_detail_log (`business_identity_id`,`request_no`,`base_amount`,`status`) values {$insert_data}";
             //Log::error($sql);
             $status = DB::statement($sql);
             if( $status !== true ) {
@@ -396,7 +398,7 @@ class FinanceController extends Controller
 
             $ids = trim($ids,',');
 
-            $sql = "UPDATE tools_bill_detail_log SET base_amount = CASE id {$when1} END , status = CASE id {$when2} END WHERE id IN ($ids)";
+            $sql = "UPDATE {$table_prefix}bill_detail_log SET base_amount = CASE id {$when1} END , status = CASE id {$when2} END WHERE id IN ($ids)";
             $status = DB::statement($sql);
             if( $status !== true ) {
                 return $this->error('上传失败2');
@@ -502,6 +504,8 @@ class FinanceController extends Controller
         $result = ['row' => $total_row , 'column' => $total_column];
 
         //DB::beginTransaction();
+        $default_db = config("database.default");
+        $table_prefix = config("database.connections.{$default_db}.prefix");
 
         $count = 0;
         $insert_data_array = [];
@@ -555,7 +559,7 @@ class FinanceController extends Controller
                         $insert_data .= "('{$value['business_identity_id']}','{$value['request_no']}','{$value['amount']}','{$value['status']}'),";
                     }
                     $insert_data = trim($insert_data,',');
-                    $sql = "insert into tools_bill_detail_log (`business_identity_id`,`request_no`,`account_amount`,`status`) values {$insert_data}";
+                    $sql = "insert into {$table_prefix}bill_detail_log (`business_identity_id`,`request_no`,`account_amount`,`status`) values {$insert_data}";
                     //Log::error($sql);
                     $status = DB::statement($sql);
                     if( $status !== true ) {
@@ -576,7 +580,7 @@ class FinanceController extends Controller
 
                     $ids = trim($ids,',');
 
-                    $sql = "UPDATE tools_bill_detail_log SET account_amount = CASE id {$when1} END , status = CASE id {$when2} END WHERE id IN ($ids)";
+                    $sql = "UPDATE {$table_prefix}bill_detail_log SET account_amount = CASE id {$when1} END , status = CASE id {$when2} END WHERE id IN ($ids)";
                     //Log::error($sql);
                     $status = DB::statement($sql);
                     if( $status !== true ) {
@@ -595,7 +599,7 @@ class FinanceController extends Controller
                 $insert_data .= "('{$value['business_identity_id']}','{$value['request_no']}','{$value['amount']}','{$value['status']}'),";
             }
             $insert_data = trim($insert_data,',');
-            $sql = "insert into tools_bill_detail_log (`business_identity_id`,`request_no`,`account_amount`,`status`) values {$insert_data}";
+            $sql = "insert into {$table_prefix}bill_detail_log (`business_identity_id`,`request_no`,`account_amount`,`status`) values {$insert_data}";
             //Log::error($sql);
             $status = DB::statement($sql);
             if( $status !== true ) {
@@ -616,7 +620,7 @@ class FinanceController extends Controller
 
             $ids = trim($ids,',');
 
-            $sql = "UPDATE tools_bill_detail_log SET account_amount = CASE id {$when1} END , status = CASE id {$when2} END WHERE id IN ($ids)";
+            $sql = "UPDATE {$table_prefix}bill_detail_log SET account_amount = CASE id {$when1} END , status = CASE id {$when2} END WHERE id IN ($ids)";
             //Log::error($sql);
             $status = DB::statement($sql);
             if( $status !== true ) {
