@@ -27,6 +27,7 @@ class CreateMenuTable extends Migration
             $table->tinyInteger('status')->default('0')->comment('是否显示');
             $table->timestamp('created_at')->useCurrent()->comment('创建时间');
             $table->timestamp('update_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('更新时间');
+            $table->index(['pid']);
         });
     }
 

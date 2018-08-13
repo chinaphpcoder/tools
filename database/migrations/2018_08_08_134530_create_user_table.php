@@ -24,22 +24,9 @@ class CreateUserTable extends Migration
             $table->string('remember_token',255)->nullable()->comment('登录token');
             $table->timestamp('created_at')->useCurrent()->comment('创建时间');
             $table->timestamp('update_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('更新时间');
-            // $table->charset('utf8mb4');
-            // $table->collation('utf8mb4_unicode_ci');
+            $table->index(['email']);
         });
     }
-// CREATE TABLE `tools_users` (
-//   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-//   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-//   `test` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-//   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-//   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-//   `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-//   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-//   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-//   PRIMARY KEY (`id`),
-//   UNIQUE KEY `users_email_unique` (`email`)
-// ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     /**
      * Reverse the migrations.
      *
