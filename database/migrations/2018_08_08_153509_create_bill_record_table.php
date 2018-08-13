@@ -24,6 +24,7 @@ class CreateBillRecordTable extends Migration
             $table->tinyInteger('status')->default('0')->comment('状态 0：未上传文件 1：已上传基准文件 2：已上传实际数据 3：平账 4：不平账');
             $table->timestamp('created_at')->useCurrent()->comment('创建时间');
             $table->timestamp('update_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('更新时间');
+            $table->index(['business_identity']);
         });
     }
 

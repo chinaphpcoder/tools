@@ -207,5 +207,5 @@ Route::get('/finance/show-data','FinanceController@showData')->middleware('auth'
 Route::get('/finance/get-data','FinanceController@getData')->middleware('auth')->name('finance.get-data');
 Route::get('/finance/export-data','FinanceController@exportData')->middleware('auth')->name('finance.export-data');
 
-Route::get('/test/tree','TestController@tree')->middleware('auth')->name('test.tree');
+Route::get('/test/tree','TestController@tree')->name('test.tree');
 Route::get('/test/readxls','TestController@readxls')->middleware('auth')->name('test.readxls');

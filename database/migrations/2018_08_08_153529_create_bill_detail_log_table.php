@@ -25,6 +25,9 @@ class CreateBillDetailLogTable extends Migration
             $table->tinyInteger('status')->default('0')->comment('状态 1：平账 2：短款 3：长款');
             $table->timestamp('created_at')->useCurrent()->comment('创建时间');
             $table->timestamp('update_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))->comment('更新时间');
+            $table->unique(['business_identity_id','request_no']);
+            $table->index(['base_amount']);
+            $table->index(['account_amount']);
         });
     }
 

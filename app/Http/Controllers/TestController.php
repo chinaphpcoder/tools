@@ -31,6 +31,7 @@ class TestController extends Controller{
     public function readxls() {
 
         $time_start = time();
+        echo "start:",time(),"<br>";
 
         $tmp_name = "/tmp/123.xlsx";
 
@@ -120,6 +121,7 @@ class TestController extends Controller{
             }
             $count++;
             if( $count % 5000 == 0 ) {
+                echo $count,":",time(),"<br>";
                 // DB::commit();
                 // DB::beginTransaction();
                 if($insert_data_array != null) {
@@ -137,6 +139,7 @@ class TestController extends Controller{
                 }
 
                 if($update_data_array != null) {
+                    
                     $when1 = '';
                     $when2 = '';
                     $ids = '';
@@ -158,6 +161,10 @@ class TestController extends Controller{
                 }
                 $insert_data_array = [];
                 $update_data_array = [];
+                echo $count,":",time(),"<br>";
+                if( $count % 20000 == 0 ) {
+                    break;
+                }
             }
 
         }
